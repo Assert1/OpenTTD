@@ -22,7 +22,6 @@
 #include "../safeguards.h"
 
 #define ATLAS_SIZE		1024		// atlas texture layer dimension
-#define DEF_BUFFER		GL_FRONT	// GL_FRONT or GL_BACK in case of double buffer
 #define ATLAS_ALIGN		8			// alignment of sprites in the atlas
 #define DOWNSCALE		2			// downscale of the color sprites
 
@@ -969,8 +968,6 @@ void Blitter_OpenGL::FlushPixels()
 	glDisable(GL_BLEND);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glReadBuffer(DEF_BUFFER);
-	glDrawBuffer(DEF_BUFFER);
 
 	if ((_pixel_size_x != _size_x) || (_pixel_size_y != _size_y))
 	{
@@ -1687,8 +1684,6 @@ void Blitter_OpenGL::Flush()
 	if (_multisample_set > 0 && GLAD_GL_VERSION_3_3) glDisable(GL_MULTISAMPLE);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glReadBuffer(DEF_BUFFER);
-	glDrawBuffer(DEF_BUFFER);
 
 	///
 
@@ -1790,8 +1785,6 @@ void Blitter_OpenGL::Finish3D()
 	if (_multisample_set > 0 && GLAD_GL_VERSION_3_3) glDisable(GL_MULTISAMPLE);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glReadBuffer(DEF_BUFFER);
-	glDrawBuffer(DEF_BUFFER);
 
 	_overlay_z = 0.5f; // restore overlay z
 }
