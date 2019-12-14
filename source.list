@@ -952,6 +952,7 @@ script/api/script_window.cpp
 	blitter/8bpp_optimized.hpp
 	blitter/8bpp_simple.cpp
 	blitter/8bpp_simple.hpp
+	blitter/opengl.hpp
 	blitter/opengl.cpp
 #end
 blitter/base.hpp
@@ -1104,7 +1105,9 @@ video/null_v.cpp
 	#end
 	#if WIN32
 		video/win32_v.cpp
+		video/win32_gdi.h
 		video/win32_gdi.cpp
+		video/win32_ogl.h
 		video/win32_ogl.cpp
 	#end
 #end
@@ -1191,13 +1194,23 @@ sound/null_s.cpp
 thread.h
 
 # glew
-3rdparty/glew.c
+3rdparty/opengl/glew.h
+3rdparty/opengl/glxew.h
+3rdparty/opengl/wglew.h
+3rdparty/opengl/glew.c
 
 # 3d viewport
+viewport3d/config3d.h
 viewport3d/config3d.cpp
+viewport3d/gfx3d.h
 viewport3d/gfx3d.cpp
+viewport3d/image3d.h
 viewport3d/image3d.cpp
+viewport3d/link3d.h
 viewport3d/link3d.cpp
+viewport3d/math3d.h
 viewport3d/math3d.cpp
+viewport3d/model3d.h
 viewport3d/model3d.cpp
+viewport3d/viewport3d.h
 viewport3d/viewport3d.cpp
