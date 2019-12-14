@@ -1193,11 +1193,8 @@ sound/null_s.cpp
 # Threading
 thread.h
 
-# glew
-3rdparty/opengl/glew.h
-3rdparty/opengl/glxew.h
-3rdparty/opengl/wglew.h
-3rdparty/opengl/glew.c
+# glad
+3rdparty/glad/src/glad.c
 
 # 3d viewport
 viewport3d/config3d.h
