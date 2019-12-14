@@ -2814,7 +2814,7 @@ static void DrawDataColor(const ViewPort *vp)
 
 				glDrawElementsInstancedBaseVertex(GL_TRIANGLES, cmd.count, GL_UNSIGNED_INT, (void*)(cmd.firstIndex * sizeof(uint32)), cmd.instanceCount, cmd.baseVertex);
 			}
-			for (int i = 3; i < 9; i++) glVertexAttribDivisor((GLuint)(_land_object_attribs_link[i]), 1);
+			for (int i = 3; i < 9; i++) glVertexAttribDivisor((GLuint)(_land_object_attribs_link[i]), 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
@@ -2841,7 +2841,7 @@ static void DrawDataColor(const ViewPort *vp)
 
 				glDrawElementsInstanced(GL_TRIANGLES, cmd.count, GL_UNSIGNED_INT, (void*)(cmd.firstIndex * sizeof(uint32)), cmd.instanceCount);
 			}
-			for (int i = 3; i < 9; i++) glVertexAttribDivisor((GLuint)(_land_object_attribs_link[i]), 1);
+			for (int i = 3; i < 9; i++) glVertexAttribDivisor((GLuint)(_land_object_attribs_link[i]), 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
@@ -3031,14 +3031,14 @@ static void DrawDataColor(const ViewPort *vp)
 
 				glDrawElementsInstancedBaseVertex(GL_TRIANGLES, cmd.count, GL_UNSIGNED_INT, (void*)(cmd.firstIndex * sizeof(uint32)), cmd.instanceCount, cmd.baseVertex);
 			}
-			for (int i = 3; i < 9; i++) glVertexAttribDivisor((GLuint)(_object_attribs_link[i]), 1);
+			for (int i = 3; i < 9; i++) glVertexAttribDivisor((GLuint)(_object_attribs_link[i]), 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 		else
 		{
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _model_index_buffer);
-			for (int i = 3; i < 8; i++) glVertexAttribDivisor((GLuint)(_object_attribs_link[i]), 1);
+			for (int i = 3; i < 9; i++) glVertexAttribDivisor((GLuint)(_object_attribs_link[i]), 1);
 			for (const DrawElementsIndirectCmd &cmd : _object_instance_cmd)
 			{
 				glBindBuffer(GL_ARRAY_BUFFER, _model_vertex_buffer);
@@ -3058,7 +3058,7 @@ static void DrawDataColor(const ViewPort *vp)
 
 				glDrawElementsInstanced(GL_TRIANGLES, cmd.count, GL_UNSIGNED_INT, (void*)(cmd.firstIndex * sizeof(uint32)), cmd.instanceCount);
 			}
-			for (int i = 3; i < 8; i++) glVertexAttribDivisor((GLuint)(_object_attribs_link[i]), 0);
+			for (int i = 3; i < 9; i++) glVertexAttribDivisor((GLuint)(_object_attribs_link[i]), 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
