@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -99,6 +99,18 @@
     </Filter>
     <Filter Include="Threading">
       <UniqueIdentifier>{c76ff9f1-1e62-46d8-8d55-000000000032}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="glew">
+      <UniqueIdentifier>{c76ff9f1-1e62-46d8-8d55-000000000033}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3d viewport">
+      <UniqueIdentifier>{c76ff9f1-1e62-46d8-8d55-000000000034}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shader">
+      <UniqueIdentifier>{abd1300c-59fa-468e-8205-d316f67fcc33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="glad">
+      <UniqueIdentifier>{19f0fa8a-3632-4dfe-9a8b-4c29487758fb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -2712,6 +2724,12 @@
     <ClInclude Include="..\src\blitter\8bpp_simple.hpp">
       <Filter>Blitters</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\blitter\opengl.hpp">
+      <Filter>Blitters</Filter>
+    </ClInclude>
+    <ClCompile Include="..\src\blitter\opengl.cpp">
+      <Filter>Blitters</Filter>
+    </ClCompile>
     <ClInclude Include="..\src\blitter\base.hpp">
       <Filter>Blitters</Filter>
     </ClInclude>
@@ -3069,6 +3087,12 @@
     <ClCompile Include="..\src\video\win32_v.cpp">
       <Filter>Video</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\video\win32_gdi.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\video\win32_ogl.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\music\dmusic.cpp">
       <Filter>Music</Filter>
     </ClCompile>
@@ -3108,9 +3132,128 @@
     <ClInclude Include="..\src\thread.h">
       <Filter>Threading</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\3rdparty\opengl\glew.h">
+      <Filter>glew</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\3rdparty\opengl\glxew.h">
+      <Filter>glew</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\3rdparty\opengl\wglew.h">
+      <Filter>glew</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\viewport3d\config3d.h">
+      <Filter>3d viewport</Filter>
+    </ClInclude>
+    <ClCompile Include="..\src\viewport3d\config3d.cpp">
+      <Filter>3d viewport</Filter>
+    </ClCompile>
+    <ClInclude Include="..\src\viewport3d\gfx3d.h">
+      <Filter>3d viewport</Filter>
+    </ClInclude>
+    <ClCompile Include="..\src\viewport3d\gfx3d.cpp">
+      <Filter>3d viewport</Filter>
+    </ClCompile>
+    <ClInclude Include="..\src\viewport3d\image3d.h">
+      <Filter>3d viewport</Filter>
+    </ClInclude>
+    <ClCompile Include="..\src\viewport3d\image3d.cpp">
+      <Filter>3d viewport</Filter>
+    </ClCompile>
+    <ClInclude Include="..\src\viewport3d\link3d.h">
+      <Filter>3d viewport</Filter>
+    </ClInclude>
+    <ClCompile Include="..\src\viewport3d\link3d.cpp">
+      <Filter>3d viewport</Filter>
+    </ClCompile>
+    <ClInclude Include="..\src\viewport3d\math3d.h">
+      <Filter>3d viewport</Filter>
+    </ClInclude>
+    <ClCompile Include="..\src\viewport3d\math3d.cpp">
+      <Filter>3d viewport</Filter>
+    </ClCompile>
+    <ClInclude Include="..\src\viewport3d\model3d.h">
+      <Filter>3d viewport</Filter>
+    </ClInclude>
+    <ClCompile Include="..\src\viewport3d\model3d.cpp">
+      <Filter>3d viewport</Filter>
+    </ClCompile>
+    <ClInclude Include="..\src\viewport3d\viewport3d.h">
+      <Filter>3d viewport</Filter>
+    </ClInclude>
+    <ClCompile Include="..\src\viewport3d\viewport3d.cpp">
+      <Filter>3d viewport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\3rdparty\glad\src\glad.c">
+      <Filter>glad</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\media\openttd.ico" />
     <None Include="..\README.md" />
+    <None Include="..\bin\shader\batch.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\bin\shader\batch.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\bin\shader\blit.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\bin\shader\blit.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\bin\shader\fill_land.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\bin\shader\fill_land.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\bin\shader\fill_object.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\bin\shader\fill_object.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\bin\shader\land.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\bin\shader\land.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\bin\shader\land_object.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\bin\shader\land_object.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\bin\shader\land_sel.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\bin\shader\land_sel.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\bin\shader\null.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\bin\shader\null.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\bin\shader\object.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\bin\shader\object.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\bin\shader\pixels.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\bin\shader\pixels.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\media\openttd.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\3rdparty\glad\include\glad\glad.h">
+      <Filter>glad</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

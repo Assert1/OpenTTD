@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -106,8 +106,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>..\objs\langs;..\objs\settings;..\src\3rdparty\squirrel\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;WIN32_ENABLE_DIRECTMUSIC_SUPPORT;WITH_XAUDIO2;WITH_SSE;WITH_ZLIB;WITH_LZO;WITH_LIBLZMA;WITH_PNG;WITH_UNISCRIBE;ENABLE_NETWORK;WITH_PERSONAL_DIR;PERSONAL_DIR="OpenTTD";WITH_ASSERT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\objs\langs;..\objs\settings;..\src\3rdparty\squirrel\include;..\src\3rdparty\glad\include;../libs/libpng/inc;../libs/freetype/inc;../libs/lzma/inc;../libs/zlib/inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;WIN32_ENABLE_DIRECTMUSIC_SUPPORT;WITH_XAUDIO2;WITH_SSE;WITH_ZLIB;_WITH_LZO;WITH_LIBLZMA;WITH_PNG;WITH_UNISCRIBE;ENABLE_NETWORK;WITH_PERSONAL_DIR;PERSONAL_DIR="OpenTTD";WITH_ASSERT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -132,13 +132,14 @@
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
+      <DisableSpecificWarnings>4800;4996;4244</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0809</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;winmm.lib;ws2_32.lib;imm32.lib;freetype.ia32.lib;libpng.ia32.lib;lzma.ia32.lib;zlib.ia32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -152,6 +153,8 @@
       <TargetMachine>MachineX86</TargetMachine>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
+      <AdditionalLibraryDirectories>../libs/libpng/lib;../libs/freetype/lib;../libs/lzma/lib;../libs/zlib/lib;</AdditionalLibraryDirectories>
+      <Profile>true</Profile>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>os_versions.manifest</AdditionalManifestFiles>
@@ -171,8 +174,8 @@
       <AdditionalOptions>/J /Zc:throwingNew %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <AdditionalIncludeDirectories>..\objs\langs;..\objs\settings;..\src\3rdparty\squirrel\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32_ENABLE_DIRECTMUSIC_SUPPORT;WITH_XAUDIO2;WITH_SSE;WITH_ZLIB;WITH_LZO;WITH_LIBLZMA;WITH_PNG;WITH_UNISCRIBE;ENABLE_NETWORK;WITH_PERSONAL_DIR;PERSONAL_DIR="OpenTTD";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\objs\langs;..\objs\settings;..\src\3rdparty\squirrel\include;..\src\3rdparty\glad\include;../libs/libpng/inc;../libs/freetype/inc;../libs/lzma/inc;../libs/zlib/inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32_ENABLE_DIRECTMUSIC_SUPPORT;WITH_XAUDIO2;WITH_SSE;WITH_ZLIB;_WITH_LZO;WITH_LIBLZMA;WITH_PNG;WITH_UNISCRIBE;ENABLE_NETWORK;WITH_PERSONAL_DIR;PERSONAL_DIR="OpenTTD";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>
@@ -188,13 +191,14 @@
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
+      <DisableSpecificWarnings>4800;4996;4244</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0809</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;winmm.lib;ws2_32.lib;imm32.lib;freetype.ia32_d.lib;libpng.ia32_d.lib;lzma.ia32_d.lib;zlib.ia32_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreSpecificDefaultLibraries>LIBCMT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -206,6 +210,7 @@
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
       <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
+      <AdditionalLibraryDirectories>../libs/libpng/lib;../libs/freetype/lib;../libs/lzma/lib;../libs/zlib/lib;</AdditionalLibraryDirectories>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>os_versions.manifest</AdditionalManifestFiles>
@@ -229,8 +234,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>..\objs\langs;..\objs\settings;..\src\3rdparty\squirrel\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;WIN32_ENABLE_DIRECTMUSIC_SUPPORT;WITH_XAUDIO2;WITH_SSE;WITH_ZLIB;WITH_LZO;WITH_LIBLZMA;WITH_PNG;WITH_UNISCRIBE;ENABLE_NETWORK;WITH_PERSONAL_DIR;PERSONAL_DIR="OpenTTD";_SQ64;WITH_ASSERT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\objs\langs;..\objs\settings;..\src\3rdparty\squirrel\include;..\src\3rdparty\glad\include;../libs/libpng/inc;../libs/freetype/inc;../libs/lzma/inc;../libs/zlib/inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;WIN32_ENABLE_DIRECTMUSIC_SUPPORT;WITH_XAUDIO2;WITH_SSE;WITH_ZLIB;_WITH_LZO;WITH_LIBLZMA;WITH_PNG;WITH_UNISCRIBE;ENABLE_NETWORK;WITH_PERSONAL_DIR;PERSONAL_DIR="OpenTTD";_SQ64;WITH_ASSERT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -255,13 +260,14 @@
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
+      <DisableSpecificWarnings>4800;4996;4244</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0809</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;winmm.lib;ws2_32.lib;imm32.lib;freetype.x64.lib;libpng.x64.lib;lzma.x64.lib;zlib.x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -272,6 +278,8 @@
       <TargetMachine>MachineX64</TargetMachine>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <MinimumRequiredVersion>5.02</MinimumRequiredVersion>
+      <AdditionalLibraryDirectories>../libs/libpng/lib;../libs/freetype/lib;../libs/lzma/lib;../libs/zlib/lib;</AdditionalLibraryDirectories>
+      <Profile>true</Profile>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>os_versions.manifest</AdditionalManifestFiles>
@@ -292,8 +300,8 @@
       <AdditionalOptions>/J /Zc:throwingNew %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <AdditionalIncludeDirectories>..\objs\langs;..\objs\settings;..\src\3rdparty\squirrel\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32_ENABLE_DIRECTMUSIC_SUPPORT;WITH_XAUDIO2;WITH_SSE;WITH_ZLIB;WITH_LZO;WITH_LIBLZMA;WITH_PNG;WITH_UNISCRIBE;ENABLE_NETWORK;WITH_PERSONAL_DIR;PERSONAL_DIR="OpenTTD";_SQ64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\objs\langs;..\objs\settings;..\src\3rdparty\squirrel\include;..\src\3rdparty\glad\include;../libs/libpng/inc;../libs/freetype/inc;../libs/lzma/inc;../libs/zlib/inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32_ENABLE_DIRECTMUSIC_SUPPORT;WITH_XAUDIO2;WITH_SSE;WITH_ZLIB;_WITH_LZO;WITH_LIBLZMA;WITH_PNG;WITH_UNISCRIBE;ENABLE_NETWORK;WITH_PERSONAL_DIR;PERSONAL_DIR="OpenTTD";_SQ64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>
@@ -313,13 +321,14 @@
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
+      <DisableSpecificWarnings>4800;4996;4244</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0809</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;ws2_32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;winmm.lib;ws2_32.lib;imm32.lib;freetype.x64_d.lib;libpng.x64_d.lib;lzma.x64_d.lib;zlib.x64_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreSpecificDefaultLibraries>LIBCMT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -328,6 +337,7 @@
       <StackCommitSize>1048576</StackCommitSize>
       <TargetMachine>MachineX64</TargetMachine>
       <MinimumRequiredVersion>5.02</MinimumRequiredVersion>
+      <AdditionalLibraryDirectories>../libs/libpng/lib;../libs/freetype/lib;../libs/lzma/lib;../libs/zlib/lib;</AdditionalLibraryDirectories>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>os_versions.manifest</AdditionalManifestFiles>
@@ -338,10 +348,12 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\3rdparty\glad\src\glad.c" />
     <ClCompile Include="..\src\airport.cpp" />
     <ClCompile Include="..\src\animated_tile.cpp" />
     <ClCompile Include="..\src\articulated_vehicles.cpp" />
     <ClCompile Include="..\src\autoreplace.cpp" />
+    <ClCompile Include="..\src\blitter\opengl.cpp" />
     <ClCompile Include="..\src\bmp.cpp" />
     <ClCompile Include="..\src\cargoaction.cpp" />
     <ClCompile Include="..\src\cargomonitor.cpp" />
@@ -431,11 +443,24 @@
     <ClCompile Include="..\src\townname.cpp" />
     <ClCompile Include="..\src\vehicle.cpp" />
     <ClCompile Include="..\src\vehiclelist.cpp" />
+    <ClCompile Include="..\src\video\win32_gdi.cpp" />
+    <ClCompile Include="..\src\video\win32_ogl.cpp" />
     <ClCompile Include="..\src\viewport.cpp" />
+    <ClCompile Include="..\src\viewport3d\config3d.cpp" />
+    <ClCompile Include="..\src\viewport3d\gfx3d.cpp" />
+    <ClCompile Include="..\src\viewport3d\image3d.cpp" />
+    <ClCompile Include="..\src\viewport3d\link3d.cpp" />
+    <ClCompile Include="..\src\viewport3d\math3d.cpp" />
+    <ClCompile Include="..\src\viewport3d\model3d.cpp" />
+    <ClCompile Include="..\src\viewport3d\viewport3d.cpp" />
     <ClCompile Include="..\src\viewport_sprite_sorter_sse4.cpp" />
     <ClCompile Include="..\src\waypoint.cpp" />
     <ClCompile Include="..\src\widget.cpp" />
     <ClCompile Include="..\src\window.cpp" />
+    <ClInclude Include="..\src\3rdparty\glad\include\glad\glad.h" />
+    <ClInclude Include="..\src\3rdparty\OpenGL\glew.h" />
+    <ClInclude Include="..\src\3rdparty\OpenGL\glxew.h" />
+    <ClInclude Include="..\src\3rdparty\OpenGL\wglew.h" />
     <ClInclude Include="..\src\aircraft.h" />
     <ClInclude Include="..\src\airport.h" />
     <ClInclude Include="..\src\animated_tile_func.h" />
@@ -449,6 +474,7 @@
     <ClInclude Include="..\src\base_media_func.h" />
     <ClInclude Include="..\src\base_station_base.h" />
     <ClInclude Include="..\src\bitmap_type.h" />
+    <ClInclude Include="..\src\blitter\opengl.hpp" />
     <ClInclude Include="..\src\bmp.h" />
     <ClInclude Include="..\src\bridge.h" />
     <ClInclude Include="..\src\cargo_type.h" />
@@ -699,6 +725,13 @@
     <ClInclude Include="..\src\vehicle_gui_base.h" />
     <ClInclude Include="..\src\vehicle_type.h" />
     <ClInclude Include="..\src\vehiclelist.h" />
+    <ClInclude Include="..\src\viewport3d\config3d.h" />
+    <ClInclude Include="..\src\viewport3d\gfx3d.h" />
+    <ClInclude Include="..\src\viewport3d\image3d.h" />
+    <ClInclude Include="..\src\viewport3d\link3d.h" />
+    <ClInclude Include="..\src\viewport3d\math3d.h" />
+    <ClInclude Include="..\src\viewport3d\model3d.h" />
+    <ClInclude Include="..\src\viewport3d\viewport3d.h" />
     <ClInclude Include="..\src\viewport_func.h" />
     <ClInclude Include="..\src\viewport_kdtree.h" />
     <ClInclude Include="..\src\viewport_sprite_sorter.h" />
@@ -1342,6 +1375,26 @@
     <ClInclude Include="..\src\thread.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\bin\shader\batch.frag" />
+    <None Include="..\bin\shader\batch.vert" />
+    <None Include="..\bin\shader\blit.frag" />
+    <None Include="..\bin\shader\blit.vert" />
+    <None Include="..\bin\shader\fill_land.frag" />
+    <None Include="..\bin\shader\fill_land.vert" />
+    <None Include="..\bin\shader\fill_object.frag" />
+    <None Include="..\bin\shader\fill_object.vert" />
+    <None Include="..\bin\shader\land.frag" />
+    <None Include="..\bin\shader\land.vert" />
+    <None Include="..\bin\shader\land_object.frag" />
+    <None Include="..\bin\shader\land_object.vert" />
+    <None Include="..\bin\shader\land_sel.frag" />
+    <None Include="..\bin\shader\land_sel.vert" />
+    <None Include="..\bin\shader\null.frag" />
+    <None Include="..\bin\shader\null.vert" />
+    <None Include="..\bin\shader\object.frag" />
+    <None Include="..\bin\shader\object.vert" />
+    <None Include="..\bin\shader\pixels.frag" />
+    <None Include="..\bin\shader\pixels.vert" />
     <None Include="..\media\openttd.ico" />
     <None Include="..\README.md" />
   </ItemGroup>

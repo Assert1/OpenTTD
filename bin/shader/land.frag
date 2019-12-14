@@ -14,7 +14,7 @@ layout(location = 0) out vec4 frag_color;
 
 vec2 atlas_edge_bound(vec2 tex)
 {
-#ifdef GL_VERSION_3_3
+#ifdef _GL_VERSION_3_3
 	ivec2 size = textureSize(atlas_c, 0).xy;
 
 	vec2 dxt = dFdx(tex) * size;

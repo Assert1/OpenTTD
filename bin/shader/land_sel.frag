@@ -11,12 +11,12 @@ layout(location = 0) out vec4 frag_color;
 
 vec2 atlas_edge_bound(vec2 tex)
 {
-#ifdef GL_VERSION_3_3
+#ifdef _GL_VERSION_3_3
 	ivec2 size = textureSize(atlas_c, 0).xy;
 
 	vec2 dxt = dFdx(tex) * size;
-    vec2 dyt = dFdy(tex) * size;
-    float dmax_sqr = max(dot(dxt, dxt), dot(dyt, dyt));
+	vec2 dyt = dFdy(tex) * size;
+	float dmax_sqr = max(dot(dxt, dxt), dot(dyt, dyt));
 
 	float k = (255.0 / (2.0 * size.x)); // assume square atlas
 	float p = (dmax_sqr + 4.0) / (4.0 * 256.0) - 1e-5;

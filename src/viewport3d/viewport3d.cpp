@@ -50,8 +50,6 @@ static int _multisample_set = _settings_client.gui.opengl_multisample; // curren
 
 ///
 
-extern int _opengl_ver;				// we are running 4.3 or 3.3?
-
 extern TileInfo *_cur_ti;			// info about currently drawn tile
 extern DrawPixelInfo *_cur_dpi;		// 2D drawing control data
 extern DrawPixelInfo _screen;		// screen drawing control data
@@ -2264,7 +2262,7 @@ static void UpdateShadowFrame()
 	glGenFramebuffers(5, _shadow_frame);
 
 	glBindTexture(GL_TEXTURE_2D, _shadow_texture);
-	glTexStorage2D(GL_TEXTURE_2D, 5, glewIsSupported("GL_ARB_depth_buffer_float") ? GL_DEPTH_COMPONENT32F : GL_DEPTH_COMPONENT32, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
+	glTexStorage2D(GL_TEXTURE_2D, 5, GLAD_GL_ARB_depth_buffer_float ? GL_DEPTH_COMPONENT32F : GL_DEPTH_COMPONENT32, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	for (int i = 0; i < 5; i++)
@@ -2294,7 +2292,7 @@ static void UpdateLandProgram()
 
 	glBindVertexArray(_land_vertex_format);
 	for (int i = 0; i < 5; i++) glEnableVertexAttribArray((GLuint)(_land_attribs_link[i]));
-	if (_opengl_ver > 0)
+	if (GLAD_GL_VERSION_4_3)
 	{
 		for (int i = 0; i < 5; i++) glVertexAttribBinding((GLuint)(_land_attribs_link[i]), 0);
 		glVertexAttribFormat((GLuint)(_land_attribs_link[0]), 3, GL_FLOAT, GL_FALSE, (GLuint)(cpp_offsetof(TileVertex, pos[0])));
@@ -2334,7 +2332,7 @@ static void UpdateLandSelProgram()
 
 	glBindVertexArray(_land_sel_vertex_format);
 	for (int i = 0; i < 4; i++) glEnableVertexAttribArray((GLuint)(_land_sel_attribs_link[i]));
-	if (_opengl_ver > 0)
+	if (GLAD_GL_VERSION_4_3)
 	{
 		for (int i = 0; i < 4; i++) glVertexAttribBinding((GLuint)(_land_sel_attribs_link[i]), 0);
 		glVertexAttribFormat((GLuint)(_land_sel_attribs_link[0]), 3, GL_FLOAT, GL_FALSE, (GLuint)(cpp_offsetof(TileVertex, pos[1])));
@@ -2376,7 +2374,7 @@ static void UpdateLandObjectProgram()
 
 	glBindVertexArray(_land_object_vertex_format);
 	for (int i = 0; i < 9; i++) glEnableVertexAttribArray((GLuint)(_land_object_attribs_link[i]));
-	if (_opengl_ver > 0)
+	if (GLAD_GL_VERSION_4_3)
 	{
 		for (int i = 0; i < 3; i++) glVertexAttribBinding((GLuint)(_land_object_attribs_link[i]), 0);
 		for (int i = 3; i < 9; i++) glVertexAttribBinding((GLuint)(_land_object_attribs_link[i]), 1);
@@ -2428,7 +2426,7 @@ static void UpdateObjectProgram()
 
 	glBindVertexArray(_object_vertex_format);
 	for (int i = 0; i < 9; i++) glEnableVertexAttribArray((GLuint)(_object_attribs_link[i]));
-	if (_opengl_ver > 0)
+	if (GLAD_GL_VERSION_4_3)
 	{
 		for (int i = 0; i < 3; i++) glVertexAttribBinding((GLuint)(_object_attribs_link[i]), 0);
 		for (int i = 3; i < 9; i++) glVertexAttribBinding((GLuint)(_object_attribs_link[i]), 1);
@@ -2473,7 +2471,7 @@ static void UpdateFillLandProgram()
 
 	glBindVertexArray(_fill_land_vertex_format);
 	for (int i = 0; i < 3; i++) glEnableVertexAttribArray((GLuint)(_fill_land_attribs_link[i]));
-	if (_opengl_ver > 0)
+	if (GLAD_GL_VERSION_4_3)
 	{
 		for (int i = 0; i < 3; i++) glVertexAttribBinding((GLuint)(_fill_land_attribs_link[i]), 0);
 		glVertexAttribFormat((GLuint)(_fill_land_attribs_link[0]), 3, GL_FLOAT, GL_FALSE, (GLuint)(cpp_offsetof(TileVertex, pos[0])));
@@ -2510,7 +2508,7 @@ static void UpdateFillObjectProgram()
 
 	glBindVertexArray(_fill_object_vertex_format);
 	for (int i = 0; i < 7; i++) glEnableVertexAttribArray((GLuint)(_fill_object_attribs_link[i]));
-	if (_opengl_ver > 0)
+	if (GLAD_GL_VERSION_4_3)
 	{
 		for (int i = 0; i < 2; i++) glVertexAttribBinding((GLuint)(_fill_object_attribs_link[i]), 0);
 		for (int i = 2; i < 7; i++) glVertexAttribBinding((GLuint)(_fill_object_attribs_link[i]), 1);
@@ -2645,7 +2643,7 @@ static void DrawDataColor(const ViewPort *vp)
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindSampler(0, _sampler[0]);
-		glBindTexture(GL_TEXTURE_1D, blitter->PalTexture());
+		glBindTexture(GL_TEXTURE_2D, blitter->PalTexture());
 		glUniform1i(_land_uniforms_link[3], 0);
 
 		glActiveTexture(GL_TEXTURE1);
@@ -2680,7 +2678,7 @@ static void DrawDataColor(const ViewPort *vp)
 		glPolygonOffset(0.0f, 32.0f);
 
 		glBindVertexArray(_land_vertex_format);
-		if (_opengl_ver > 0)
+		if (GLAD_GL_VERSION_4_3)
 		{
 			glBindVertexBuffer(0, _land.vertex_buffer, 0, sizeof(TileVertex));
 		}
@@ -2698,7 +2696,7 @@ static void DrawDataColor(const ViewPort *vp)
 		glBindVertexArray(0);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_1D, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 		glBindSampler(0, 0);
 
 		glActiveTexture(GL_TEXTURE1);
@@ -2735,7 +2733,7 @@ static void DrawDataColor(const ViewPort *vp)
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindSampler(0, _sampler[0]);
-		glBindTexture(GL_TEXTURE_1D, blitter->PalTexture());
+		glBindTexture(GL_TEXTURE_2D, blitter->PalTexture());
 		glUniform1i(_land_object_uniforms_link[3], 0);
 
 		glActiveTexture(GL_TEXTURE1);
@@ -2769,7 +2767,7 @@ static void DrawDataColor(const ViewPort *vp)
 		glDepthFunc(GL_LESS);
 
 		glBindVertexArray(_land_object_vertex_format);
-		if (_opengl_ver > 0)
+		if (GLAD_GL_VERSION_4_3)
 		{
 			glBindVertexBuffer(0, _model_vertex_buffer, 0, sizeof(ModelVertex));
 			glBindVertexBuffer(1, _model_instance_buffer, 0, sizeof(ModelInstance));
@@ -2813,7 +2811,7 @@ static void DrawDataColor(const ViewPort *vp)
 		glBindVertexArray(0);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_1D, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 		glBindSampler(0, 0);
 
 		glActiveTexture(GL_TEXTURE1);
@@ -2846,7 +2844,7 @@ static void DrawDataColor(const ViewPort *vp)
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindSampler(0, _sampler[0]);
-		glBindTexture(GL_TEXTURE_1D, blitter->PalTexture());
+		glBindTexture(GL_TEXTURE_2D, blitter->PalTexture());
 		glUniform1i(_land_sel_uniforms_link[2], 0);
 
 		glActiveTexture(GL_TEXTURE1);
@@ -2869,7 +2867,7 @@ static void DrawDataColor(const ViewPort *vp)
 		glDepthMask(GL_FALSE);
 
 		glBindVertexArray(_land_sel_vertex_format);
-		if (_opengl_ver > 0)
+		if (GLAD_GL_VERSION_4_3)
 		{
 			glBindVertexBuffer(0, _land.vertex_buffer, 0, sizeof(TileVertex));
 		}
@@ -2915,7 +2913,7 @@ static void DrawDataColor(const ViewPort *vp)
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindSampler(0, _sampler[0]);
-		glBindTexture(GL_TEXTURE_1D, blitter->PalTexture());
+		glBindTexture(GL_TEXTURE_2D, blitter->PalTexture());
 		glUniform1i(_object_uniforms_link[3], 0);
 
 		glActiveTexture(GL_TEXTURE1);
@@ -2949,7 +2947,7 @@ static void DrawDataColor(const ViewPort *vp)
 		glDepthFunc(GL_LESS);
 
 		glBindVertexArray(_object_vertex_format);
-		if (_opengl_ver > 0)
+		if (GLAD_GL_VERSION_4_3)
 		{
 			glBindVertexBuffer(0, _model_vertex_buffer, 0, sizeof(ModelVertex));
 			glBindVertexBuffer(1, _model_instance_buffer, 0, sizeof(ModelInstance));
@@ -2993,7 +2991,7 @@ static void DrawDataColor(const ViewPort *vp)
 		glBindVertexArray(0);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_1D, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 		glBindSampler(0, 0);
 
 		glActiveTexture(GL_TEXTURE1);
@@ -3050,7 +3048,7 @@ static void DrawDataTransp(const ViewPort *vp)
 		glDepthFunc(GL_LESS);
 
 		glBindVertexArray(_fill_object_vertex_format);
-		if (_opengl_ver > 0)
+		if (GLAD_GL_VERSION_4_3)
 		{
 			glBindVertexBuffer(0, _model_vertex_buffer, 0, sizeof(ModelVertex));
 			glBindVertexBuffer(1, _model_instance_buffer, 0, sizeof(ModelInstance));
@@ -3135,7 +3133,7 @@ static void DrawDataDepth()
 		glPolygonOffset(1.0f, 4096.0f); // may be 1.0f is even too much
 
 		glBindVertexArray(_fill_land_vertex_format);
-		if (_opengl_ver > 0)
+		if (GLAD_GL_VERSION_4_3)
 		{
 			glBindVertexBuffer(0, _land.vertex_buffer, 0, sizeof(TileVertex));
 		}
@@ -3180,7 +3178,7 @@ static void DrawDataDepth()
 		glPolygonOffset(1.0f, 4096.0f); // may be 1.0f is even too much
 
 		glBindVertexArray(_fill_object_vertex_format);
-		if (_opengl_ver > 0)
+		if (GLAD_GL_VERSION_4_3)
 		{
 			glBindVertexBuffer(0, _model_vertex_buffer, 0, sizeof(ModelVertex));
 			glBindVertexBuffer(1, _model_instance_buffer, 0, sizeof(ModelInstance));
@@ -4051,7 +4049,7 @@ void DrawViewport3D(const ViewPort *vp)
 	DrawDataTransp(vp);
 
 	/// debug stuff
-/**/
+/*
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
@@ -4090,7 +4088,7 @@ void DrawViewport3D(const ViewPort *vp)
 		glEnd();
 	}
 /**/
-/**/
+/*
 	for (int i = 0; i < _draw_veh.size(); i++)
 	{
 		VehicleData *c = _draw_veh[i];

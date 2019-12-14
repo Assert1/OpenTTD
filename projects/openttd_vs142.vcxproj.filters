@@ -100,6 +100,12 @@
     <Filter Include="Threading">
       <UniqueIdentifier>{c76ff9f1-1e62-46d8-8d55-000000000032}</UniqueIdentifier>
     </Filter>
+    <Filter Include="glew">
+      <UniqueIdentifier>{c76ff9f1-1e62-46d8-8d55-000000000033}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3d viewport">
+      <UniqueIdentifier>{c76ff9f1-1e62-46d8-8d55-000000000034}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\airport.cpp">
@@ -967,6 +973,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\video\sdl_v.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\video\sdl2_v.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\settings_func.h">
@@ -2712,6 +2721,12 @@
     <ClInclude Include="..\src\blitter\8bpp_simple.hpp">
       <Filter>Blitters</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\blitter\opengl.hpp">
+      <Filter>Blitters</Filter>
+    </ClInclude>
+    <ClCompile Include="..\src\blitter\opengl.cpp">
+      <Filter>Blitters</Filter>
+    </ClCompile>
     <ClInclude Include="..\src\blitter\base.hpp">
       <Filter>Blitters</Filter>
     </ClInclude>
@@ -3069,6 +3084,18 @@
     <ClCompile Include="..\src\video\win32_v.cpp">
       <Filter>Video</Filter>
     </ClCompile>
+    <ClInclude Include="..\src\video\win32_gdi.h">
+      <Filter>Video</Filter>
+    </ClInclude>
+    <ClCompile Include="..\src\video\win32_gdi.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClInclude Include="..\src\video\win32_ogl.h">
+      <Filter>Video</Filter>
+    </ClInclude>
+    <ClCompile Include="..\src\video\win32_ogl.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\music\dmusic.cpp">
       <Filter>Music</Filter>
     </ClCompile>
@@ -3108,6 +3135,60 @@
     <ClInclude Include="..\src\thread.h">
       <Filter>Threading</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\3rdparty\opengl\glew.h">
+      <Filter>glew</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\3rdparty\opengl\glxew.h">
+      <Filter>glew</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\3rdparty\opengl\wglew.h">
+      <Filter>glew</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\3rdparty\opengl\glew.c">
+      <Filter>glew</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\viewport3d\config3d.h">
+      <Filter>3d viewport</Filter>
+    </ClInclude>
+    <ClCompile Include="..\src\viewport3d\config3d.cpp">
+      <Filter>3d viewport</Filter>
+    </ClCompile>
+    <ClInclude Include="..\src\viewport3d\gfx3d.h">
+      <Filter>3d viewport</Filter>
+    </ClInclude>
+    <ClCompile Include="..\src\viewport3d\gfx3d.cpp">
+      <Filter>3d viewport</Filter>
+    </ClCompile>
+    <ClInclude Include="..\src\viewport3d\image3d.h">
+      <Filter>3d viewport</Filter>
+    </ClInclude>
+    <ClCompile Include="..\src\viewport3d\image3d.cpp">
+      <Filter>3d viewport</Filter>
+    </ClCompile>
+    <ClInclude Include="..\src\viewport3d\link3d.h">
+      <Filter>3d viewport</Filter>
+    </ClInclude>
+    <ClCompile Include="..\src\viewport3d\link3d.cpp">
+      <Filter>3d viewport</Filter>
+    </ClCompile>
+    <ClInclude Include="..\src\viewport3d\math3d.h">
+      <Filter>3d viewport</Filter>
+    </ClInclude>
+    <ClCompile Include="..\src\viewport3d\math3d.cpp">
+      <Filter>3d viewport</Filter>
+    </ClCompile>
+    <ClInclude Include="..\src\viewport3d\model3d.h">
+      <Filter>3d viewport</Filter>
+    </ClInclude>
+    <ClCompile Include="..\src\viewport3d\model3d.cpp">
+      <Filter>3d viewport</Filter>
+    </ClCompile>
+    <ClInclude Include="..\src\viewport3d\viewport3d.h">
+      <Filter>3d viewport</Filter>
+    </ClInclude>
+    <ClCompile Include="..\src\viewport3d\viewport3d.cpp">
+      <Filter>3d viewport</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\media\openttd.ico" />
