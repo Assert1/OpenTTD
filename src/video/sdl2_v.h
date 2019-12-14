@@ -40,6 +40,8 @@ public:
 	void EditBoxLostFocus() override;
 
 	const char *GetName() const override { return "sdl"; }
+
+	virtual bool Hardware() { return true; }
 private:
 	int PollEvent();
 	bool CreateMainSurface(uint w, uint h, bool resize);
