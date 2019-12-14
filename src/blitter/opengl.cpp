@@ -1746,8 +1746,6 @@ void Blitter_OpenGL::Finish()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
-	glFlush();
-
 	_flushed = 0;
 }
 

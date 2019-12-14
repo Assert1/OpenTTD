@@ -138,6 +138,8 @@ void VideoDriver_Win32_OGL::DoPaintWindow(void *pdc)
 	}
 
 	blitter->Finish();
+
+	glFlush();
 //	SwapBuffers(_wnd.dc);
 }
 
