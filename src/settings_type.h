@@ -165,6 +165,14 @@ struct GUISettings {
 	bool   newgrf_show_old_versions;         ///< whether to show old versions in the NewGRF list
 	uint8  newgrf_default_palette;           ///< default palette to use for NewGRFs without action 14 palette information
 
+	uint8  opengl_multisample;               ///< OpenGL blitter frame buffer multisampling mode (MSAA/CSAA)
+	bool   view3d_use;                       ///< use viewports 3d renderer
+	bool   view3d_use_perspective;           ///< use perspective projection or orthographic
+	bool   view3d_use_shadows;               ///< use shadows
+	uint8  view3d_shadows_res;               ///< base shadows texture resolution shift
+	uint8  view3d_shadows_res_inc;           ///< selected shadows texture resolution shift
+	bool   view3d_shadows_from_transp;       ///< cast shadows from the transparent objects
+
 	/**
 	 * Returns true when the user has sufficient privileges to edit newgrfs on a running game
 	 * @return whether the user has sufficient privileges to edit newgrfs in an existing game

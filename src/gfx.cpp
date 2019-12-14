@@ -20,6 +20,7 @@
 #include "window_func.h"
 #include "newgrf_debug.h"
 #include "thread.h"
+#include "viewport3d/gfx3d.h"
 
 #include "table/palettes.h"
 #include "table/string_colours.h"
@@ -35,10 +36,12 @@ CursorVars _cursor;
 bool _ctrl_pressed;   ///< Is Ctrl pressed?
 bool _shift_pressed;  ///< Is Shift pressed?
 byte _fast_forward;
-bool _left_button_down;     ///< Is left mouse button pressed?
-bool _left_button_clicked;  ///< Is left mouse button clicked?
-bool _right_button_down;    ///< Is right mouse button pressed?
-bool _right_button_clicked; ///< Is right mouse button clicked?
+bool _left_button_down;      ///< Is left mouse button pressed?
+bool _left_button_clicked;   ///< Is left mouse button clicked?
+bool _right_button_down;     ///< Is right mouse button pressed?
+bool _right_button_clicked;  ///< Is right mouse button clicked?
+bool _middle_button_down;    ///< Is middle mouse button pressed?
+bool _middle_button_clicked; ///< Is middle mouse button clicked?
 DrawPixelInfo _screen;
 bool _screen_disable_anim = false;   ///< Disable palette animation (important for 32bpp-anim blitter during giant screenshot)
 bool _exit_game;
@@ -67,8 +70,7 @@ ZoomLevel _font_zoom; ///< Font Zoom level
  * @ingroup dirty
  */
 static Rect _invalid_rect;
-static const byte *_colour_remap_ptr;
-static byte _string_colourremap[3]; ///< Recoloursprite for stringdrawing. The grf loader ensures that #ST_FONT sprites only use colours 0 to 2.
+static PaletteID _colour_remap_pal;
 
 static const uint DIRTY_BLOCK_HEIGHT   = 8;
 static const uint DIRTY_BLOCK_WIDTH    = 64;
@@ -136,21 +138,12 @@ void GfxFillRect(int left, int top, int right, int bottom, int colour, FillRectM
 
 	switch (mode) {
 		default: // FILLRECT_OPAQUE
-			blitter->DrawRect(dst, right, bottom, (uint8)colour);
+			blitter->DrawRect(dst, right, bottom, (uint8)colour, (mode == FILLRECT_CHECKER) ? (((oleft - left + dpi->left + otop - top + dpi->top) & 1) + 1) : 0);
 			break;
 
 		case FILLRECT_RECOLOUR:
 			blitter->DrawColourMappingRect(dst, right, bottom, GB(colour, 0, PALETTE_WIDTH));
 			break;
-
-		case FILLRECT_CHECKER: {
-			byte bo = (oleft - left + dpi->left + otop - top + dpi->top) & 1;
-			do {
-				for (int i = (bo ^= 1); i < right; i += 2) blitter->SetPixel(dst, i, 0, (uint8)colour);
-				dst = blitter->MoveTo(dst, 0, 1);
-			} while (--bottom > 0);
-			break;
-		}
 	}
 }
 
@@ -318,9 +311,10 @@ static void SetColourRemap(TextColour colour)
 	bool raw_colour = (colour & TC_IS_PALETTE_COLOUR) != 0;
 	colour &= ~(TC_NO_SHADE | TC_IS_PALETTE_COLOUR);
 
+	_colour_remap_pal = 0;
+	byte *_string_colourremap = ((byte*)&_colour_remap_pal) + 1;
 	_string_colourremap[1] = raw_colour ? (byte)colour : _string_colourmap[colour];
 	_string_colourremap[2] = no_shade ? 0 : 1;
-	_colour_remap_ptr = _string_colourremap;
 }
 
 /**
@@ -338,7 +332,7 @@ static void SetColourRemap(TextColour colour)
  * @return In case of left or center alignment the right most pixel we have drawn to.
  *         In case of right alignment the left most pixel we have drawn to.
  */
-static int DrawLayoutLine(const ParagraphLayouter::Line &line, int y, int left, int right, StringAlignment align, bool underline, bool truncation)
+int DrawLayoutLine(const ParagraphLayouter::Line &line, int y, int left, int right, StringAlignment align, bool underline, bool truncation)
 {
 	if (line.CountRuns() == 0) return 0;
 
@@ -472,6 +466,7 @@ static int DrawLayoutLine(const ParagraphLayouter::Line &line, int y, int left, 
 	}
 
 	if (underline) {
+		byte *_string_colourremap = ((byte*)&_colour_remap_pal) + 1;
 		GfxFillRect(left, y + h, right, y + h, _string_colourremap[1]);
 	}
 
@@ -809,13 +804,13 @@ void DrawSpriteViewport(SpriteID img, PaletteID pal, int x, int y, const SubSpri
 {
 	SpriteID real_sprite = GB(img, 0, SPRITE_WIDTH);
 	if (HasBit(img, PALETTE_MODIFIER_TRANSPARENT)) {
-		_colour_remap_ptr = GetNonSprite(GB(pal, 0, PALETTE_WIDTH), ST_RECOLOUR) + 1;
+		_colour_remap_pal = GB(pal, 0, PALETTE_WIDTH) | USE_PAL_REMAP;
 		GfxMainBlitterViewport(GetSprite(real_sprite, ST_NORMAL), x, y, BM_TRANSPARENT, sub, real_sprite);
 	} else if (pal != PAL_NONE) {
 		if (HasBit(pal, PALETTE_TEXT_RECOLOUR)) {
 			SetColourRemap((TextColour)GB(pal, 0, PALETTE_WIDTH));
 		} else {
-			_colour_remap_ptr = GetNonSprite(GB(pal, 0, PALETTE_WIDTH), ST_RECOLOUR) + 1;
+			_colour_remap_pal = GB(pal, 0, PALETTE_WIDTH) | USE_PAL_REMAP;
 		}
 		GfxMainBlitterViewport(GetSprite(real_sprite, ST_NORMAL), x, y, GetBlitterMode(pal), sub, real_sprite);
 	} else {
@@ -836,13 +831,13 @@ void DrawSprite(SpriteID img, PaletteID pal, int x, int y, const SubSprite *sub,
 {
 	SpriteID real_sprite = GB(img, 0, SPRITE_WIDTH);
 	if (HasBit(img, PALETTE_MODIFIER_TRANSPARENT)) {
-		_colour_remap_ptr = GetNonSprite(GB(pal, 0, PALETTE_WIDTH), ST_RECOLOUR) + 1;
+		_colour_remap_pal = GB(pal, 0, PALETTE_WIDTH) | USE_PAL_REMAP;
 		GfxMainBlitter(GetSprite(real_sprite, ST_NORMAL), x, y, BM_TRANSPARENT, sub, real_sprite, zoom);
 	} else if (pal != PAL_NONE) {
 		if (HasBit(pal, PALETTE_TEXT_RECOLOUR)) {
 			SetColourRemap((TextColour)GB(pal, 0, PALETTE_WIDTH));
 		} else {
-			_colour_remap_ptr = GetNonSprite(GB(pal, 0, PALETTE_WIDTH), ST_RECOLOUR) + 1;
+			_colour_remap_pal = GB(pal, 0, PALETTE_WIDTH) | USE_PAL_REMAP;
 		}
 		GfxMainBlitter(GetSprite(real_sprite, ST_NORMAL), x, y, GetBlitterMode(pal), sub, real_sprite, zoom);
 	} else {
@@ -911,7 +906,7 @@ static void GfxBlitter(const Sprite * const sprite, int x, int y, BlitterMode mo
 
 	bp.dst = dpi->dst_ptr;
 	bp.pitch = dpi->pitch;
-	bp.remap = _colour_remap_ptr;
+	bp.pal = _colour_remap_pal;
 
 	assert(sprite->width > 0);
 	assert(sprite->height > 0);
@@ -1205,11 +1200,12 @@ void ScreenSizeChanged()
 
 void UndrawMouseCursor()
 {
+	Blitter *blitter = BlitterFactory::GetCurrentBlitter();
+
 	/* Don't undraw the mouse cursor if the screen is not ready */
-	if (_screen.dst_ptr == nullptr) return;
+	if ((_screen.dst_ptr == nullptr) || blitter->Hardware()) return;
 
 	if (_cursor.visible) {
-		Blitter *blitter = BlitterFactory::GetCurrentBlitter();
 		_cursor.visible = false;
 		blitter->CopyFromBuffer(blitter->MoveTo(_screen.dst_ptr, _cursor.draw_pos.x, _cursor.draw_pos.y), _cursor_backup.GetBuffer(), _cursor.draw_size.x, _cursor.draw_size.y);
 		VideoDriver::GetInstance()->MakeDirty(_cursor.draw_pos.x, _cursor.draw_pos.y, _cursor.draw_size.x, _cursor.draw_size.y);
@@ -1218,17 +1214,18 @@ void UndrawMouseCursor()
 
 void DrawMouseCursor()
 {
-	/* Don't draw the mouse cursor if the screen is not ready */
-	if (_screen.dst_ptr == nullptr) return;
-
 	Blitter *blitter = BlitterFactory::GetCurrentBlitter();
 
+	/* Don't draw the mouse cursor if the screen is not ready */
+	if ((_screen.dst_ptr == nullptr) && !blitter->Hardware()) return;
+	
 	/* Redraw mouse cursor but only when it's inside the window */
 	if (!_cursor.in_window) return;
 
 	/* Don't draw the mouse cursor if it's already drawn */
 	if (_cursor.visible) {
-		if (!_cursor.dirty) return;
+		/* Constantly redraw the cursor in a hardware mode */
+		if (!_cursor.dirty && !blitter->Hardware()) return;
 		UndrawMouseCursor();
 	}
 
@@ -1260,10 +1257,14 @@ void DrawMouseCursor()
 	_cursor.draw_size.x = width;
 	_cursor.draw_size.y = height;
 
-	uint8 *buffer = _cursor_backup.Allocate(blitter->BufferSize(_cursor.draw_size.x, _cursor.draw_size.y));
+	/* No need to save anything in a hardware mode */
+	if (!blitter->Hardware())
+	{
+		uint8 *buffer = _cursor_backup.Allocate(blitter->BufferSize(_cursor.draw_size.x, _cursor.draw_size.y));
 
-	/* Make backup of stuff below cursor */
-	blitter->CopyToBuffer(blitter->MoveTo(_screen.dst_ptr, _cursor.draw_pos.x, _cursor.draw_pos.y), buffer, _cursor.draw_size.x, _cursor.draw_size.y);
+		/* Make backup of stuff below cursor */
+		blitter->CopyToBuffer(blitter->MoveTo(_screen.dst_ptr, _cursor.draw_pos.x, _cursor.draw_pos.y), buffer, _cursor.draw_size.x, _cursor.draw_size.y);
+	}
 
 	/* Draw cursor on screen */
 	_cur_dpi = &_screen;
@@ -1303,11 +1304,8 @@ void RedrawScreenRect(int left, int top, int right, int bottom)
  */
 void DrawDirtyBlocks()
 {
-	byte *b = _dirty_blocks;
 	const int w = Align(_screen.width,  DIRTY_BLOCK_WIDTH);
 	const int h = Align(_screen.height, DIRTY_BLOCK_HEIGHT);
-	int x;
-	int y;
 
 	if (HasModalProgress()) {
 		/* We are generating the world, so release our rights to the map and
@@ -1332,67 +1330,75 @@ void DrawDirtyBlocks()
 		if (_switch_mode != SM_NONE && !HasModalProgress()) return;
 	}
 
-	y = 0;
-	do {
-		x = 0;
+	if (_draw3d)
+	{
+		RedrawDirtyRects();
+	}
+	else
+	{
+		byte *b = _dirty_blocks;
+		int y = 0;
 		do {
-			if (*b != 0) {
-				int left;
-				int top;
-				int right = x + DIRTY_BLOCK_WIDTH;
-				int bottom = y;
-				byte *p = b;
-				int h2;
+			int x = 0;
+			do {
+				if (*b != 0) {
+					int left;
+					int top;
+					int right = x + DIRTY_BLOCK_WIDTH;
+					int bottom = y;
+					byte *p = b;
+					int h2;
 
-				/* First try coalescing downwards */
-				do {
-					*p = 0;
-					p += _dirty_bytes_per_line;
-					bottom += DIRTY_BLOCK_HEIGHT;
-				} while (bottom != h && *p != 0);
-
-				/* Try coalescing to the right too. */
-				h2 = (bottom - y) / DIRTY_BLOCK_HEIGHT;
-				assert(h2 > 0);
-				p = b;
-
-				while (right != w) {
-					byte *p2 = ++p;
-					int h = h2;
-					/* Check if a full line of dirty flags is set. */
+					/* First try coalescing downwards */
 					do {
-						if (!*p2) goto no_more_coalesc;
-						p2 += _dirty_bytes_per_line;
-					} while (--h != 0);
+						*p = 0;
+						p += _dirty_bytes_per_line;
+						bottom += DIRTY_BLOCK_HEIGHT;
+					} while (bottom != h && *p != 0);
 
-					/* Wohoo, can combine it one step to the right!
-					 * Do that, and clear the bits. */
-					right += DIRTY_BLOCK_WIDTH;
+					/* Try coalescing to the right too. */
+					h2 = (bottom - y) / DIRTY_BLOCK_HEIGHT;
+					assert(h2 > 0);
+					p = b;
 
-					h = h2;
-					p2 = p;
-					do {
-						*p2 = 0;
-						p2 += _dirty_bytes_per_line;
-					} while (--h != 0);
+					while (right != w) {
+						byte *p2 = ++p;
+						int h = h2;
+						/* Check if a full line of dirty flags is set. */
+						do {
+							if (!*p2) goto no_more_coalesc;
+							p2 += _dirty_bytes_per_line;
+						} while (--h != 0);
+
+						/* Wohoo, can combine it one step to the right!
+						 * Do that, and clear the bits. */
+						right += DIRTY_BLOCK_WIDTH;
+
+						h = h2;
+						p2 = p;
+						do {
+							*p2 = 0;
+							p2 += _dirty_bytes_per_line;
+						} while (--h != 0);
+					}
+					no_more_coalesc:
+
+					left = x;
+					top = y;
+
+					if (left   < _invalid_rect.left  ) left   = _invalid_rect.left;
+					if (top    < _invalid_rect.top   ) top    = _invalid_rect.top;
+					if (right  > _invalid_rect.right ) right  = _invalid_rect.right;
+					if (bottom > _invalid_rect.bottom) bottom = _invalid_rect.bottom;
+
+					if (left < right && top < bottom) {
+						RedrawScreenRect(left, top, right, bottom);
+					}
+
 				}
-				no_more_coalesc:
-
-				left = x;
-				top = y;
-
-				if (left   < _invalid_rect.left  ) left   = _invalid_rect.left;
-				if (top    < _invalid_rect.top   ) top    = _invalid_rect.top;
-				if (right  > _invalid_rect.right ) right  = _invalid_rect.right;
-				if (bottom > _invalid_rect.bottom) bottom = _invalid_rect.bottom;
-
-				if (left < right && top < bottom) {
-					RedrawScreenRect(left, top, right, bottom);
-				}
-
-			}
-		} while (b++, (x += DIRTY_BLOCK_WIDTH) != w);
-	} while (b += -(int)(w / DIRTY_BLOCK_WIDTH) + _dirty_bytes_per_line, (y += DIRTY_BLOCK_HEIGHT) != h);
+			} while (b++, (x += DIRTY_BLOCK_WIDTH) != w);
+		} while (b += -(int)(w / DIRTY_BLOCK_WIDTH) + _dirty_bytes_per_line, (y += DIRTY_BLOCK_HEIGHT) != h);
+	}
 
 	++_dirty_block_colour;
 	_invalid_rect.left = w;
@@ -1418,10 +1424,6 @@ void DrawDirtyBlocks()
  */
 void SetDirtyBlocks(int left, int top, int right, int bottom)
 {
-	byte *b;
-	int width;
-	int height;
-
 	if (left < 0) left = 0;
 	if (top < 0) top = 0;
 	if (right > _screen.width) right = _screen.width;
@@ -1434,13 +1436,19 @@ void SetDirtyBlocks(int left, int top, int right, int bottom)
 	if (right  > _invalid_rect.right ) _invalid_rect.right  = right;
 	if (bottom > _invalid_rect.bottom) _invalid_rect.bottom = bottom;
 
+	if (_draw3d)
+	{
+		MarkRectsDirty(left, top, right, bottom);
+		return;
+	}
+
 	left /= DIRTY_BLOCK_WIDTH;
 	top  /= DIRTY_BLOCK_HEIGHT;
 
-	b = _dirty_blocks + top * _dirty_bytes_per_line + left;
+	byte *b = _dirty_blocks + top * _dirty_bytes_per_line + left;
 
-	width  = ((right  - 1) / DIRTY_BLOCK_WIDTH)  - left + 1;
-	height = ((bottom - 1) / DIRTY_BLOCK_HEIGHT) - top  + 1;
+	int width  = ((right  - 1) / DIRTY_BLOCK_WIDTH)  - left + 1;
+	int height = ((bottom - 1) / DIRTY_BLOCK_HEIGHT) - top  + 1;
 
 	assert(width > 0 && height > 0);
 

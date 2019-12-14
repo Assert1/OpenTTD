@@ -16,6 +16,8 @@
 #include "../gfx_func.h"
 #include "../core/random_func.hpp"
 #include "../fios.h"
+#include "../viewport3d/gfx3d.h"
+#include "../viewport3d/viewport3d.h"
 
 #include "saveload.h"
 
@@ -61,6 +63,7 @@ void ResetViewportAfterLoadGame()
 		while (vp->zoom < _settings_client.gui.zoom_min) DoZoomInOutWindow(ZOOM_OUT, w);
 		while (vp->zoom > _settings_client.gui.zoom_max) DoZoomInOutWindow(ZOOM_IN, w);
 	}
+	if (_draw3d) SetViewportPosition3D(w->viewport);
 
 	DoZoomInOutWindow(ZOOM_NONE, w); // update button status
 	MarkWholeScreenDirty();

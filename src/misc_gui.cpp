@@ -25,6 +25,8 @@
 #include "newgrf_debug.h"
 #include "zoom_func.h"
 #include "guitimer_func.h"
+#include "viewport3d/gfx3d.h"
+#include "viewport3d/viewport3d.h"
 
 #include "widgets/misc_widget.h"
 
@@ -583,7 +585,8 @@ void ShowCostOrIncomeAnimation(int x, int y, int z, Money cost)
 		msg = STR_INCOME_FLOAT_INCOME;
 	}
 	SetDParam(0, cost);
-	AddTextEffect(msg, pt.x, pt.y, DAY_TICKS, TE_RISING);
+	TextEffectID id = AddTextEffect(msg, pt.x, pt.y, DAY_TICKS, TE_RISING);
+	if (_draw3d) AddTextEffect3D(id, x, y, z, msg, cost, 0);
 }
 
 /**
@@ -598,9 +601,11 @@ void ShowFeederIncomeAnimation(int x, int y, int z, Money transfer, Money income
 {
 	Point pt = RemapCoords(x, y, z);
 
+	TextEffectID id;
 	SetDParam(0, transfer);
 	if (income == 0) {
-		AddTextEffect(STR_FEEDER, pt.x, pt.y, DAY_TICKS, TE_RISING);
+		id = AddTextEffect(STR_FEEDER, pt.x, pt.y, DAY_TICKS, TE_RISING);
+		if (_draw3d) AddTextEffect3D(id, x, y, z, STR_FEEDER, transfer, 0);
 	} else {
 		StringID msg = STR_FEEDER_COST;
 		if (income < 0) {
@@ -608,7 +613,8 @@ void ShowFeederIncomeAnimation(int x, int y, int z, Money transfer, Money income
 			msg = STR_FEEDER_INCOME;
 		}
 		SetDParam(1, income);
-		AddTextEffect(msg, pt.x, pt.y, DAY_TICKS, TE_RISING);
+		id = AddTextEffect(msg, pt.x, pt.y, DAY_TICKS, TE_RISING);
+		if (_draw3d) AddTextEffect3D(id, x, y, z, msg, income, 0);
 	}
 }
 
@@ -628,7 +634,9 @@ TextEffectID ShowFillingPercent(int x, int y, int z, uint8 percent, StringID str
 	assert(string != STR_NULL);
 
 	SetDParam(0, percent);
-	return AddTextEffect(string, pt.x, pt.y, 0, TE_STATIC);
+	TextEffectID id = AddTextEffect(string, pt.x, pt.y, 0, TE_STATIC);
+	if (_draw3d) AddTextEffect3D(id, x, y, z, string, percent, 0);
+	return id;
 }
 
 /**
@@ -642,6 +650,7 @@ void UpdateFillingPercent(TextEffectID te_id, uint8 percent, StringID string)
 
 	SetDParam(0, percent);
 	UpdateTextEffect(te_id, string);
+	if (_draw3d) UpdateTextEffect3D(te_id, string, percent, 0);
 }
 
 /**

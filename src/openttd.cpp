@@ -64,6 +64,7 @@
 #include "viewport_func.h"
 #include "viewport_sprite_sorter.h"
 #include "framerate_type.h"
+#include "viewport3d/gfx3d.h"
 
 #include "linkgraph/linkgraphschedule.h"
 
@@ -1456,6 +1457,9 @@ void GameLoop()
 
 	IncreaseSpriteLRU();
 	InteractiveRandom();
+
+	const bool hardware = VideoDriver::GetInstance()->Hardware();
+	if (hardware) { _draw3d = _settings_client.gui.view3d_use; } else { _draw3d = 0; };
 
 	/* Check for UDP stuff */
 	if (_network_available) NetworkBackgroundLoop();

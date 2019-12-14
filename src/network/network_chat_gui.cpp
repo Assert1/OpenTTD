@@ -129,6 +129,11 @@ void NetworkInitChatMessage()
 /** Hide the chatbox */
 void NetworkUndrawChatMessage()
 {
+	Blitter *blitter = BlitterFactory::GetCurrentBlitter();
+	
+	/* No need to restore anything in a hardware mode */
+	if (blitter->Hardware()) return;
+
 	/* Sometimes we also need to hide the cursor
 	 *   This is because both textmessage and the cursor take a shot of the
 	 *   screen before drawing.
@@ -148,7 +153,6 @@ void NetworkUndrawChatMessage()
 	}
 
 	if (_chatmessage_visible) {
-		Blitter *blitter = BlitterFactory::GetCurrentBlitter();
 		int x      = _chatmsg_box.x;
 		int y      = _screen.height - _chatmsg_box.y - _chatmsg_box.height;
 		int width  = _chatmsg_box.width;
@@ -198,7 +202,9 @@ void NetworkChatMessageLoop()
 void NetworkDrawChatMessage()
 {
 	Blitter *blitter = BlitterFactory::GetCurrentBlitter();
-	if (!_chatmessage_dirty) return;
+	
+	/* Constantly redraw a chat messages in a hardware mode */
+	if (!_chatmessage_dirty && !blitter->Hardware()) return;
 
 	/* First undraw if needed */
 	NetworkUndrawChatMessage();
@@ -225,7 +231,7 @@ void NetworkDrawChatMessage()
 	assert(blitter->BufferSize(width, height) <= (int)(_chatmsg_box.width * _chatmsg_box.height * blitter->GetBytesPerPixel()));
 
 	/* Make a copy of the screen as it is before painting (for undraw) */
-	blitter->CopyToBuffer(blitter->MoveTo(_screen.dst_ptr, x, y), _chatmessage_backup, width, height);
+	if (!blitter->Hardware()) blitter->CopyToBuffer(blitter->MoveTo(_screen.dst_ptr, x, y), _chatmessage_backup, width, height);
 
 	_cur_dpi = &_screen; // switch to _screen painting
 

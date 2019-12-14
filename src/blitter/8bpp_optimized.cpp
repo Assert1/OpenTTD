@@ -40,7 +40,7 @@ void Blitter_8bppOptimized::Draw(Blitter::BlitterParams *bp, BlitterMode mode, Z
 	}
 
 	const uint8 *src_next = src;
-
+	const byte *remap = ((bp->pal & USE_PAL_REMAP) ? GetNonSprite(bp->pal & (~USE_PAL_REMAP), ST_RECOLOUR) : (const byte*)(&bp->pal)) + 1;
 	for (int y = 0; y < bp->height; y++) {
 		uint8 *dst = dst_line;
 		dst_line += bp->pitch;
@@ -86,7 +86,6 @@ void Blitter_8bppOptimized::Draw(Blitter::BlitterParams *bp, BlitterMode mode, Z
 			switch (mode) {
 				case BM_COLOUR_REMAP:
 				case BM_CRASH_REMAP: {
-					const uint8 *remap = bp->remap;
 					do {
 						uint m = remap[*src];
 						if (m != 0) *dst = m;
@@ -101,7 +100,6 @@ void Blitter_8bppOptimized::Draw(Blitter::BlitterParams *bp, BlitterMode mode, Z
 					break;
 
 				case BM_TRANSPARENT: {
-					const uint8 *remap = bp->remap;
 					src += pixels;
 					do {
 						*dst = remap[*dst];

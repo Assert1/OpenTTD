@@ -33,6 +33,8 @@
 #include "game/game_instance.hpp"
 #include "string_func.h"
 #include "thread.h"
+#include "viewport3d/gfx3d.h"
+#include "viewport3d/viewport3d.h"
 
 #include "safeguards.h"
 
@@ -129,9 +131,11 @@ static void _GenerateWorld()
 
 			ConvertGroundTilesIntoWaterTiles();
 			IncreaseGeneratingWorldProgress(GWP_OBJECT);
+			if (_draw3d) ResetViewport3D();
 		} else {
 			GenerateLandscape(_gw.mode);
 			GenerateClearTile();
+			if (_draw3d) ResetViewport3D();
 
 			/* Only generate towns, tree and industries in newgame mode. */
 			if (_game_mode != GM_EDITOR) {

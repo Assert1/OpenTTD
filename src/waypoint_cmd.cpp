@@ -28,6 +28,8 @@
 #include "company_base.h"
 #include "water.h"
 #include "company_gui.h"
+#include "viewport3d/gfx3d.h"
+#include "viewport3d/viewport3d.h"
 
 #include "table/strings.h"
 
@@ -48,6 +50,7 @@ void Waypoint::UpdateVirtCoord()
 
 	/* Recenter viewport */
 	InvalidateWindowData(WC_WAYPOINT_VIEW, this->index);
+	if (_draw3d) MarkTileDirty3D(this->xy);
 }
 
 /**
@@ -58,7 +61,11 @@ void Waypoint::MoveSign(TileIndex new_xy)
 {
 	if (this->xy == new_xy) return;
 
+	if (_draw3d) MarkTileDirty3D(this->xy);
+
 	this->BaseStation::MoveSign(new_xy);
+
+	if (_draw3d) MarkTileDirty3D(this->xy);
 }
 
 /**

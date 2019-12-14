@@ -41,8 +41,19 @@ void Blitter_8bppBase::DrawLine(void *video, int x, int y, int x2, int y2, int s
 	});
 }
 
-void Blitter_8bppBase::DrawRect(void *video, int width, int height, uint8 colour)
+void Blitter_8bppBase::DrawRect(void *video, int width, int height, uint8 colour, int checker)
 {
+	if(checker)
+	{
+		/* drawing checker pattern */
+		int bo = checker - 1;
+		do {
+			for(int i = (bo ^= 1); i < width; i += 2) SetPixel(video, i, 0, colour);
+			video = MoveTo(video, 0, 1);
+		} while(--height > 0);
+		return;
+	}
+
 	do {
 		memset(video, colour, width);
 		video = (uint8 *)video + _screen.pitch;

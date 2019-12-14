@@ -31,6 +31,8 @@
 #include "tilehighlight_func.h"
 #include "hotkeys.h"
 #include "guitimer_func.h"
+#include "viewport3d/gfx3d.h"
+#include "viewport3d/viewport3d.h"
 
 #include "saveload/saveload.h"
 
@@ -156,6 +158,7 @@ bool DoZoomInOutWindow(ZoomStateChange how, Window *w)
 			w->viewport->dest_scrollpos_x = w->viewport->scrollpos_x;
 			w->viewport->dest_scrollpos_y = w->viewport->scrollpos_y;
 			w->viewport->follow_vehicle = INVALID_VEHICLE;
+			if (_draw3d) SetViewportPosition3D(w->viewport);
 			break;
 		case ZOOM_OUT:
 			if (vp->zoom >= _settings_client.gui.zoom_max) return false;
@@ -169,6 +172,7 @@ bool DoZoomInOutWindow(ZoomStateChange how, Window *w)
 			vp->virtual_width <<= 1;
 			vp->virtual_height <<= 1;
 			w->viewport->follow_vehicle = INVALID_VEHICLE;
+			if (_draw3d) SetViewportPosition3D(w->viewport);
 			break;
 	}
 	if (vp != nullptr) { // the vp can be null when how == ZOOM_NONE
@@ -434,10 +438,15 @@ struct MainWindow : Window
 
 	void OnScroll(Point delta) override
 	{
-		this->viewport->scrollpos_x += ScaleByZoom(delta.x, this->viewport->zoom);
-		this->viewport->scrollpos_y += ScaleByZoom(delta.y, this->viewport->zoom);
 		this->viewport->dest_scrollpos_x = this->viewport->scrollpos_x;
 		this->viewport->dest_scrollpos_y = this->viewport->scrollpos_y;
+		this->viewport->dest_scrollpos_x += ScaleByZoom(delta.x, this->viewport->zoom);
+		this->viewport->dest_scrollpos_y += ScaleByZoom(delta.y, this->viewport->zoom);
+		if (_draw3d) ScrollViewport3D(this->viewport);
+
+		this->viewport->scrollpos_x = this->viewport->dest_scrollpos_x;
+		this->viewport->scrollpos_y = this->viewport->dest_scrollpos_y;
+
 		this->refresh.SetInterval(LINKGRAPH_DELAY);
 	}
 

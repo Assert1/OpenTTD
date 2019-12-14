@@ -55,6 +55,8 @@
 #include "linkgraph/refresh.h"
 #include "widgets/station_widget.h"
 #include "tunnelbridge_map.h"
+#include "viewport3d/gfx3d.h"
+#include "viewport3d/viewport3d.h"
 
 #include "table/strings.h"
 
@@ -429,6 +431,7 @@ void Station::UpdateVirtCoord()
 	_viewport_sign_kdtree.Insert(ViewportSignKdtreeItem::MakeStation(this->index));
 
 	SetWindowDirty(WC_STATION_VIEW, this->index);
+	if (_draw3d) MarkTileDirty3D(this->xy);
 }
 
 /**
@@ -440,10 +443,12 @@ void Station::MoveSign(TileIndex new_xy)
 	if (this->xy == new_xy) return;
 
 	_station_kdtree.Remove(this->index);
+	if (_draw3d) MarkTileDirty3D(this->xy);
 
 	this->BaseStation::MoveSign(new_xy);
 
 	_station_kdtree.Insert(this->index);
+	if (_draw3d) MarkTileDirty3D(this->xy);
 }
 
 /** Update the virtual coords needed to draw the station sign for all stations. */

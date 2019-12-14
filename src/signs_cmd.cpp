@@ -17,6 +17,8 @@
 #include "viewport_kdtree.h"
 #include "window_func.h"
 #include "string_func.h"
+#include "viewport3d/gfx3d.h"
+#include "viewport3d/viewport3d.h"
 
 #include "table/strings.h"
 
@@ -59,6 +61,7 @@ CommandCost CmdPlaceSign(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 
 		si->UpdateVirtCoord();
 		InvalidateWindowData(WC_SIGN_LIST, 0, 0);
 		_new_sign_id = si->index;
+		if (_draw3d) AddSign3D(si->index);
 	}
 
 	return CommandCost();
@@ -94,6 +97,7 @@ CommandCost CmdRenameSign(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32
 
 			si->UpdateVirtCoord();
 			InvalidateWindowData(WC_SIGN_LIST, 0, 1);
+			if (_draw3d) UpdateSign3D(si->index);
 		}
 	} else { // Delete sign
 		if (flags & DC_EXEC) {

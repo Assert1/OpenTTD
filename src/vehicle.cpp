@@ -51,6 +51,8 @@
 #include "linkgraph/linkgraph.h"
 #include "linkgraph/refresh.h"
 #include "framerate_type.h"
+#include "viewport3d/gfx3d.h"
+#include "viewport3d/viewport3d.h"
 
 #include "table/strings.h"
 
@@ -1171,6 +1173,8 @@ Vehicle *CheckClickOnVehicle(const ViewPort *vp, int x, int y)
 	uint dist, best_dist = UINT_MAX;
 
 	if ((uint)(x -= vp->left) >= (uint)vp->width || (uint)(y -= vp->top) >= (uint)vp->height) return nullptr;
+
+	if (_draw3d) return CheckClickOnVehicle3D(vp, x, y);
 
 	x = ScaleByZoom(x, vp->zoom) + vp->virtual_left;
 	y = ScaleByZoom(y, vp->zoom) + vp->virtual_top;

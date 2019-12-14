@@ -46,8 +46,7 @@ inline void Blitter_32bppOptimized::Draw(const Blitter::BlitterParams *bp, ZoomL
 	/* skip lines in dst */
 	Colour *dst = (Colour *)bp->dst + bp->top * bp->pitch + bp->left;
 
-	/* store so we don't have to access it via bp every time (compiler assumes pointer aliasing) */
-	const byte *remap = bp->remap;
+	const byte *remap = ((bp->pal & USE_PAL_REMAP) ? GetNonSprite(bp->pal & (~USE_PAL_REMAP), ST_RECOLOUR) : (const byte*)(&bp->pal)) + 1;
 
 	for (int y = 0; y < bp->height; y++) {
 		/* next dst line begins here */

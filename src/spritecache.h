@@ -30,6 +30,8 @@ bool SpriteExists(SpriteID sprite);
 
 SpriteType GetSpriteType(SpriteID sprite);
 uint GetOriginFileSlot(SpriteID sprite);
+uint32 GetOriginGRFID(SpriteID sprite);
+uint32 GetOriginID(SpriteID sprite);
 uint GetSpriteCountForSlot(uint file_slot, SpriteID begin, SpriteID end);
 uint GetMaxSpriteID();
 
@@ -52,7 +54,7 @@ void IncreaseSpriteLRU();
 
 void ReadGRFSpriteOffsets(byte container_version);
 size_t GetGRFSpriteOffset(uint32 id);
-bool LoadNextSprite(int load_index, byte file_index, uint file_sprite_id, byte container_version);
+bool LoadNextSprite(int load_index, byte file_index, uint file_sprite_id, byte container_version, uint32 grfid);
 bool SkipSpriteData(byte type, uint16 num);
 void DupSprite(SpriteID old_spr, SpriteID new_spr);
 

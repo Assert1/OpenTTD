@@ -95,7 +95,12 @@ public:
 	 * An edit box gained the input focus
 	 */
 	virtual void EditBoxGainedFocus() {}
-
+	
+	/**
+	 * OpenGL driver
+	 */
+	virtual bool Hardware() { return false; }
+	
 	/**
 	 * Get the currently active instance of the video driver.
 	 */

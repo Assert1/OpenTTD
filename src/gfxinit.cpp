@@ -45,7 +45,7 @@ static const SpriteID * const _landscape_spriteindexes[] = {
  * @param file_index The Fio offset to load the file in.
  * @return The number of loaded sprites.
  */
-static uint LoadGrfFile(const char *filename, uint load_index, int file_index)
+static uint LoadGrfFile(const char *filename, uint load_index, int file_index, uint32 grfid)
 {
 	uint load_index_org = load_index;
 	uint sprite_id = 0;
@@ -63,7 +63,7 @@ static uint LoadGrfFile(const char *filename, uint load_index, int file_index)
 		if (compression != 0) usererror("Unsupported compression format");
 	}
 
-	while (LoadNextSprite(load_index, file_index, sprite_id, container_ver)) {
+	while (LoadNextSprite(load_index, file_index, sprite_id, container_ver, grfid)) {
 		load_index++;
 		sprite_id++;
 		if (load_index >= MAX_SPRITES) {
@@ -82,7 +82,7 @@ static uint LoadGrfFile(const char *filename, uint load_index, int file_index)
  * @param file_index The Fio offset to load the file in.
  * @return The number of loaded sprites.
  */
-static void LoadGrfFileIndexed(const char *filename, const SpriteID *index_tbl, int file_index)
+static void LoadGrfFileIndexed(const char *filename, const SpriteID *index_tbl, int file_index, uint32 grfid)
 {
 	uint start;
 	uint sprite_id = 0;
@@ -104,7 +104,7 @@ static void LoadGrfFileIndexed(const char *filename, const SpriteID *index_tbl, 
 		uint end = *index_tbl++;
 
 		do {
-			bool b = LoadNextSprite(start, file_index, sprite_id, container_ver);
+			bool b = LoadNextSprite(start, file_index, sprite_id, container_ver, grfid);
 			assert(b);
 			sprite_id++;
 		} while (++start <= end);
@@ -166,7 +166,7 @@ static void LoadSpriteTables()
 	const GraphicsSet *used_set = BaseGraphics::GetUsedSet();
 
 	_palette_remap_grf[i] = (PAL_DOS != used_set->palette);
-	LoadGrfFile(used_set->files[GFT_BASE].filename, 0, i++);
+	LoadGrfFile(used_set->files[GFT_BASE].filename, 0, i++, 'BASE');
 
 	/*
 	 * The second basic file always starts at the given location and does
@@ -175,7 +175,7 @@ static void LoadSpriteTables()
 	 * sprites as they are not shown anyway (logos in intro game).
 	 */
 	_palette_remap_grf[i] = (PAL_DOS != used_set->palette);
-	LoadGrfFile(used_set->files[GFT_LOGOS].filename, 4793, i++);
+	LoadGrfFile(used_set->files[GFT_LOGOS].filename, 4793, i++, 'LOGO');
 
 	/*
 	 * Load additional sprites for climates other than temperate.
@@ -183,11 +183,12 @@ static void LoadSpriteTables()
 	 * and the ground sprites.
 	 */
 	if (_settings_game.game_creation.landscape != LT_TEMPERATE) {
+		uint32 climate_grfid[3] = { 'ARCT', 'TROP', 'TOYL' };
 		_palette_remap_grf[i] = (PAL_DOS != used_set->palette);
 		LoadGrfFileIndexed(
 			used_set->files[GFT_ARCTIC + _settings_game.game_creation.landscape - 1].filename,
 			_landscape_spriteindexes[_settings_game.game_creation.landscape - 1],
-			i++
+			i++, climate_grfid[_settings_game.game_creation.landscape - 1]
 		);
 	}
 
@@ -273,27 +274,31 @@ static bool SwitchNewGRFBlitter()
 		const char *name;
 		uint animation; ///< 0: no support, 1: do support, 2: both
 		uint min_base_depth, max_base_depth, min_grf_depth, max_grf_depth;
+		uint hardware; /// OpenGL blitter
 	} replacement_blitters[] = {
 #ifdef WITH_SSE
-		{ "32bpp-sse4",      0, 32, 32,  8, 32 },
-		{ "32bpp-ssse3",     0, 32, 32,  8, 32 },
-		{ "32bpp-sse2",      0, 32, 32,  8, 32 },
-		{ "32bpp-sse4-anim", 1, 32, 32,  8, 32 },
+		{ "32bpp-sse4",      0, 32, 32,  8, 32, 0 },
+		{ "32bpp-ssse3",     0, 32, 32,  8, 32, 0 },
+		{ "32bpp-sse2",      0, 32, 32,  8, 32, 0 },
+		{ "32bpp-sse4-anim", 1, 32, 32,  8, 32, 0 },
 #endif
-		{ "8bpp-optimized",  2,  8,  8,  8,  8 },
-		{ "32bpp-optimized", 0,  8, 32,  8, 32 },
+		{ "8bpp-optimized",  2,  8,  8,  8,  8, 0 },
+		{ "32bpp-optimized", 0,  8, 32,  8, 32, 0 },
 #ifdef WITH_SSE
-		{ "32bpp-sse2-anim", 1,  8, 32,  8, 32 },
+		{ "32bpp-sse2-anim", 1,  8, 32,  8, 32, 0 },
 #endif
-		{ "32bpp-anim",      1,  8, 32,  8, 32 },
+		{ "32bpp-anim",      1,  8, 32,  8, 32, 0 },
+		{ "opengl",          2,  8, 32,  8, 32, 1 },
 	};
 
+	const bool hardware = VideoDriver::GetInstance()->Hardware();
 	const bool animation_wanted = HasBit(_display_opt, DO_FULL_ANIMATION);
 	const char *cur_blitter = BlitterFactory::GetCurrentBlitter()->GetName();
 
 	VideoDriver::GetInstance()->AcquireBlitterLock();
 
 	for (uint i = 0; i < lengthof(replacement_blitters); i++) {
+		if (hardware && !replacement_blitters[i].hardware) continue;
 		if (animation_wanted && (replacement_blitters[i].animation == 0)) continue;
 		if (!animation_wanted && (replacement_blitters[i].animation == 1)) continue;
 

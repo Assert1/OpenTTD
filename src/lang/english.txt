@@ -1705,6 +1705,7 @@ STR_CONFIG_SETTING_LOCALISATION_UNITS_HEIGHT_SI                 :SI (m)
 
 STR_CONFIG_SETTING_LOCALISATION                                 :{ORANGE}Localisation
 STR_CONFIG_SETTING_GRAPHICS                                     :{ORANGE}Graphics
+STR_CONFIG_SETTING_VIEW3D                                       :{ORANGE}3D viewports
 STR_CONFIG_SETTING_SOUND                                        :{ORANGE}Sound
 STR_CONFIG_SETTING_INTERFACE                                    :{ORANGE}Interface
 STR_CONFIG_SETTING_INTERFACE_GENERAL                            :{ORANGE}General
@@ -1738,6 +1739,24 @@ STR_CONFIG_SETTING_PATHFINDER_FOR_SHIPS                         :Pathfinder for 
 STR_CONFIG_SETTING_PATHFINDER_FOR_SHIPS_HELPTEXT                :Path finder to use for ships
 STR_CONFIG_SETTING_REVERSE_AT_SIGNALS                           :Automatic reversing at signals: {STRING2}
 STR_CONFIG_SETTING_REVERSE_AT_SIGNALS_HELPTEXT                  :Allow trains to reverse on a signal, if they waited there a long time
+
+STR_CONFIG_SETTING_OPENGL_MULTISAMPLE                           :Antialiasing mode: {STRING}
+STR_CONFIG_SETTING_OPENGL_MULTISAMPLE_HELPTEXT                  :TBD
+STR_CONFIG_SETTING_OPENGL_MULTISAMPLE_DISABLED                  :disabled
+STR_CONFIG_SETTING_OPENGL_MULTISAMPLE_MSAA2X                    :MSAA 2x
+STR_CONFIG_SETTING_OPENGL_MULTISAMPLE_MSAA4X                    :MSAA 4x
+STR_CONFIG_SETTING_OPENGL_MULTISAMPLE_CSAA4X                    :CSAA 8x
+STR_CONFIG_SETTING_OPENGL_MULTISAMPLE_MSAA8X                    :MSAA 8x
+STR_CONFIG_SETTING_OPENGL_MULTISAMPLE_CSAA16X                   :CSAA 16x
+STR_CONFIG_SETTING_OPENGL_MULTISAMPLE_CSAA16XQ                  :CSAA 16xQ
+STR_CONFIG_SETTING_VIEW3D_USE                                   :Enable 3D viewports
+STR_CONFIG_SETTING_VIEW3D_USE_HELPTEXT                          :TBD
+STR_CONFIG_SETTING_VIEW3D_PERSPECTIVE                           :Use perspective projection for 3D views
+STR_CONFIG_SETTING_VIEW3D_PERSPECTIVE_HELPTEXT                  :TBD
+STR_CONFIG_SETTING_VIEW3D_SHADOWS                               :Cast object shadows for 3D views
+STR_CONFIG_SETTING_VIEW3D_SHADOWS_HELPTEXT                      :TBD
+STR_CONFIG_SETTING_VIEW3D_SHADOWS_TRANSP                        :Cast shadows from transparent objects for 3D views
+STR_CONFIG_SETTING_VIEW3D_SHADOWS_TRANSP_HELPTEXT               :TBD
 
 STR_CONFIG_SETTING_QUERY_CAPTION                                :{WHITE}Change setting value
 

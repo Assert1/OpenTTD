@@ -22,6 +22,8 @@ enum BlitterMode {
 	BM_BLACK_REMAP,  ///< Perform remapping to a completely blackened sprite
 };
 
+#define USE_PAL_REMAP	(1<<31)		///< flag to use pal entry as map(3) itself
+
 /**
  * How all blitters should look like. Extend this class to make your own.
  */
@@ -30,7 +32,7 @@ public:
 	/** Parameters related to blitting. */
 	struct BlitterParams {
 		const void *sprite; ///< Pointer to the sprite how ever the encoder stored it
-		const byte *remap;  ///< XXX -- Temporary storage for remap array
+		PaletteID pal;      ///< Color remap palette id or remap table itself (bit USE_PAL_REMAP)
 
 		int skip_left;      ///< How much pixels of the source to skip on the left (based on zoom of dst)
 		int skip_top;       ///< How much pixels of the source to skip on the top (based on zoom of dst)
@@ -104,8 +106,9 @@ public:
 	 * @param width The length of the line.
 	 * @param height The height of the line.
 	 * @param colour A 8bpp mapping colour.
+	 * @param checker Draw a checker pattern (offset 1 or 2).
 	 */
-	virtual void DrawRect(void *video, int width, int height, uint8 colour) = 0;
+	virtual void DrawRect(void *video, int width, int height, uint8 colour, int checker = 0) = 0;
 
 	/**
 	 * Draw a line with a given colour.
@@ -199,6 +202,13 @@ public:
 	 * Post resize event
 	 */
 	virtual void PostResize() { };
+
+	/**
+	  * OpenGL blitter related stuff
+	  */
+	virtual int Hardware() { return false; };
+	virtual void Flush() { };
+	virtual void Finish() { };
 
 	virtual ~Blitter() { }
 

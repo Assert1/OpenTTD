@@ -37,16 +37,19 @@ public:
 
 	void EditBoxLostFocus() override;
 
-	const char *GetName() const override { return "win32"; }
-
 	bool MakeWindow(bool full_screen);
-};
 
-/** The factory for Windows' video driver. */
-class FVideoDriver_Win32 : public DriverFactoryBase {
 public:
-	FVideoDriver_Win32() : DriverFactoryBase(Driver::DT_VIDEO, 10, "win32", "Win32 GDI Video Driver") {}
-	Driver *CreateInstance() const override { return new VideoDriver_Win32(); }
+	virtual void DoCreateWindow() = 0;
+	virtual void DoDestroyWindow() = 0;
+	virtual void DoPaintWindow(void *hdc) = 0;
+	virtual void DoQueryNewPalette() = 0;
+	virtual const char *DoStart() = 0;
+	virtual void DoStop() = 0;
+	virtual void DoFlush() = 0;
+	virtual void DoClientSizeChanged(int width, int height) = 0;
+	virtual bool DoAfterBlitterChange() = 0;
+	virtual bool IsDrawThreaded() { return true; };
 };
 
 #endif /* VIDEO_WIN32_H */

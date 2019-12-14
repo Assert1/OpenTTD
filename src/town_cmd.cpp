@@ -48,6 +48,8 @@
 #include "object_base.h"
 #include "ai/ai.hpp"
 #include "game/game.hpp"
+#include "viewport3d/gfx3d.h"
+#include "viewport3d/viewport3d.h"
 
 #include "table/strings.h"
 #include "table/town_land.h"
@@ -406,6 +408,7 @@ void Town::UpdateVirtCoord()
 	_viewport_sign_kdtree.Insert(ViewportSignKdtreeItem::MakeTown(this->index));
 
 	SetWindowDirty(WC_TOWN_VIEW, this->index);
+	if (_draw3d) MarkTileDirty3D(this->xy);
 }
 
 /** Update the virtual coords needed to draw the town sign for all towns. */

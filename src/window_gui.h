@@ -861,6 +861,7 @@ public:
 
 Window *BringWindowToFrontById(WindowClass cls, WindowNumber number);
 Window *FindWindowFromPt(int x, int y);
+bool MayBeShown(const Window *w);
 
 /**
  * Open a new window.

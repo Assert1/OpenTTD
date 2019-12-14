@@ -64,6 +64,13 @@ TextEffectID AddTextEffect(StringID msg, int center, int y, uint8 duration, Text
 	return i;
 }
 
+const ViewportSign *GetTextEffect(TextEffectID te_id)
+{
+	if ((te_id == INVALID_TE_ID) || (te_id >= _text_effects.size())) return NULL;
+	if (_text_effects[te_id].string_id == INVALID_STRING_ID) return NULL;
+	return &_text_effects[te_id];
+}
+
 void UpdateTextEffect(TextEffectID te_id, StringID msg)
 {
 	/* Update details */

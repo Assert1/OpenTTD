@@ -31,7 +31,7 @@ IGNORE_UNINITIALIZED_WARNING_START
 template <BlitterMode mode, Blitter_32bppSSE2::ReadMode read_mode, Blitter_32bppSSE2::BlockType bt_last, bool translucent, bool animated>
 inline void Blitter_32bppSSE4_Anim::Draw(const Blitter::BlitterParams *bp, ZoomLevel zoom)
 {
-	const byte * const remap = bp->remap;
+	const byte *remap = ((bp->pal & USE_PAL_REMAP) ? GetNonSprite(bp->pal & (~USE_PAL_REMAP), ST_RECOLOUR) : (const byte*)(&bp->pal)) + 1;
 	Colour *dst_line = (Colour *) bp->dst + bp->top * bp->pitch + bp->left;
 	uint16 *anim_line = this->anim_buf + this->ScreenToAnimOffset((uint32 *)bp->dst) + bp->top * this->anim_buf_pitch + bp->left;
 	int effective_width = bp->width;

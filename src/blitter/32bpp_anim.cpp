@@ -40,7 +40,7 @@ inline void Blitter_32bppAnim::Draw(const Blitter::BlitterParams *bp, ZoomLevel 
 	Colour *dst = (Colour *)bp->dst + bp->top * bp->pitch + bp->left;
 	uint16 *anim = this->anim_buf + this->ScreenToAnimOffset((uint32 *)bp->dst) + bp->top * this->anim_buf_pitch + bp->left;
 
-	const byte *remap = bp->remap; // store so we don't have to access it via bp every time
+	const byte *remap = ((bp->pal & USE_PAL_REMAP) ? GetNonSprite(bp->pal & (~USE_PAL_REMAP), ST_RECOLOUR) : (const byte*)(&bp->pal)) + 1;
 
 	for (int y = 0; y < bp->height; y++) {
 		Colour *dst_ln = dst + bp->pitch;
@@ -338,11 +338,22 @@ void Blitter_32bppAnim::DrawLine(void *video, int x, int y, int x2, int y2, int 
 	}
 }
 
-void Blitter_32bppAnim::DrawRect(void *video, int width, int height, uint8 colour)
+void Blitter_32bppAnim::DrawRect(void *video, int width, int height, uint8 colour, int checker)
 {
 	if (_screen_disable_anim) {
 		/* This means our output is not to the screen, so we can't be doing any animation stuff, so use our parent DrawRect() */
-		Blitter_32bppOptimized::DrawRect(video, width, height, colour);
+		Blitter_32bppOptimized::DrawRect(video, width, height, colour, checker);
+		return;
+	}
+
+	if(checker)
+	{
+		/* drawing checker pattern */
+		int bo = checker - 1;
+		do {
+			for(int i = (bo ^= 1); i < width; i += 2) SetPixel(video, i, 0, colour);
+			video = MoveTo(video, 0, 1);
+		} while(--height > 0);
 		return;
 	}
 

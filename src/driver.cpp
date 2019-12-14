@@ -162,17 +162,19 @@ bool DriverFactoryBase::SelectDriverImpl(const char *name, Driver::Type type)
 			if (strcasecmp(buffer, d->name) != 0) continue;
 
 			/* Found our driver, let's try it */
+			Driver *oldd = *GetActiveDriver(type);
 			Driver *newd = d->CreateInstance();
+			*GetActiveDriver(type) = newd; // we need to set active driver before Start
 
 			const char *err = newd->Start(parms);
 			if (err != nullptr) {
+				*GetActiveDriver(type) = oldd;
 				delete newd;
 				usererror("Unable to load driver '%s'. The error was: %s", d->name, err);
 			}
 
 			DEBUG(driver, 1, "Successfully loaded %s driver '%s'", GetDriverTypeName(type), d->name);
-			delete *GetActiveDriver(type);
-			*GetActiveDriver(type) = newd;
+			delete oldd;
 			return true;
 		}
 		usererror("No such %s driver: %s\n", GetDriverTypeName(type), buffer);

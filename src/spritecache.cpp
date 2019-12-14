@@ -32,6 +32,7 @@ struct SpriteCache {
 	size_t file_pos;
 	uint32 id;
 	uint16 file_slot;
+	uint32 grfid;
 	int16 lru;
 	SpriteType type;     ///< In some cases a single sprite is misused by two NewGRFs. Once as real sprite and once as recolour sprite. If the recolour sprite gets into the cache it might be drawn as real sprite which causes enormous trouble.
 	bool warned;         ///< True iff the user has been warned about incorrect use of this sprite
@@ -143,6 +144,30 @@ uint GetOriginFileSlot(SpriteID sprite)
 {
 	if (!SpriteExists(sprite)) return 0;
 	return GetSpriteCache(sprite)->file_slot;
+}
+
+/**
+* Get the GRFID of a given sprite.
+* @param sprite The sprite to look at.
+* @return GRFID of the loaded sprite
+*/
+uint32 GetOriginGRFID(SpriteID sprite)
+{
+	if (!SpriteExists(sprite)) return (uint32)(-1);
+	SpriteCache *c = GetSpriteCache(sprite);
+	return c->grfid;
+}
+
+/**
+* Get the identification info of a given sprite.
+* @param sprite The sprite to look at.
+* @return identification info of the loaded sprite
+*/
+uint32 GetOriginID(SpriteID sprite)
+{
+	if (!SpriteExists(sprite)) return (uint32)(-1);
+	SpriteCache *c = GetSpriteCache(sprite);
+	return c->id;
 }
 
 /**
@@ -521,7 +546,7 @@ void ReadGRFSpriteOffsets(byte container_version)
  * @param container_version Container version of the GRF.
  * @return True if a valid sprite was loaded, false on any error.
  */
-bool LoadNextSprite(int load_index, byte file_slot, uint file_sprite_id, byte container_version)
+bool LoadNextSprite(int load_index, byte file_slot, uint file_sprite_id, byte container_version, uint32 grfid)
 {
 	size_t file_pos = FioGetPos();
 
@@ -575,6 +600,7 @@ bool LoadNextSprite(int load_index, byte file_slot, uint file_sprite_id, byte co
 	sc->file_pos = file_pos;
 	sc->ptr = data;
 	sc->lru = 0;
+	sc->grfid = grfid;
 	sc->id = file_sprite_id;
 	sc->type = type;
 	sc->warned = false;
@@ -592,6 +618,7 @@ void DupSprite(SpriteID old_spr, SpriteID new_spr)
 	scnew->file_slot = scold->file_slot;
 	scnew->file_pos = scold->file_pos;
 	scnew->ptr = nullptr;
+	scnew->grfid = scold->grfid;
 	scnew->id = scold->id;
 	scnew->type = scold->type;
 	scnew->warned = false;

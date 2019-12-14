@@ -25,6 +25,7 @@ void Blitter_8bppSimple::Draw(Blitter::BlitterParams *bp, BlitterMode mode, Zoom
 	src_line = (const uint8 *)bp->sprite + (bp->skip_top * bp->sprite_width + bp->skip_left) * ScaleByZoom(1, zoom);
 	dst_line = (uint8 *)bp->dst + bp->top * bp->pitch + bp->left;
 
+	const byte *remap = ((bp->pal & USE_PAL_REMAP) ? GetNonSprite(bp->pal & (~USE_PAL_REMAP), ST_RECOLOUR) : (const byte*)(&bp->pal)) + 1;
 	for (int y = 0; y < bp->height; y++) {
 		dst = dst_line;
 		dst_line += bp->pitch;
@@ -38,11 +39,11 @@ void Blitter_8bppSimple::Draw(Blitter::BlitterParams *bp, BlitterMode mode, Zoom
 			switch (mode) {
 				case BM_COLOUR_REMAP:
 				case BM_CRASH_REMAP:
-					colour = bp->remap[*src];
+					colour = remap[*src];
 					break;
 
 				case BM_TRANSPARENT:
-					if (*src != 0) colour = bp->remap[*dst];
+					if (*src != 0) colour = remap[*dst];
 					break;
 
 				case BM_BLACK_REMAP:

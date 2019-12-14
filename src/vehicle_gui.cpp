@@ -36,6 +36,8 @@
 #include "station_base.h"
 #include "tilehighlight_func.h"
 #include "zoom_func.h"
+#include "viewport3d/gfx3d.h"
+#include "viewport3d/viewport3d.h"
 
 #include "safeguards.h"
 
@@ -2727,6 +2729,18 @@ public:
 			NWidgetViewport *nvp = this->GetWidget<NWidgetViewport>(WID_VV_VIEWPORT);
 			nvp->UpdateViewportCoordinates(this);
 		}
+	}
+
+	void OnScroll(Point delta) override
+	{
+		this->viewport->dest_scrollpos_x = this->viewport->scrollpos_x;
+		this->viewport->dest_scrollpos_y = this->viewport->scrollpos_y;
+		this->viewport->dest_scrollpos_x += ScaleByZoom(delta.x, this->viewport->zoom);
+		this->viewport->dest_scrollpos_y += ScaleByZoom(delta.y, this->viewport->zoom);
+		if (_draw3d) ScrollViewport3D(this->viewport);
+
+		this->viewport->scrollpos_x = this->viewport->dest_scrollpos_x;
+		this->viewport->scrollpos_y = this->viewport->dest_scrollpos_y;
 	}
 
 	void UpdateButtonStatus()

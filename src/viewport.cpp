@@ -89,6 +89,9 @@
 #include "network/network_func.h"
 #include "framerate_type.h"
 
+#include "viewport3d/gfx3d.h"
+#include "viewport3d/viewport3d.h"
+
 #include <map>
 
 #include "table/strings.h"
@@ -182,7 +185,7 @@ static void MarkViewportDirty(const ViewPort *vp, int left, int top, int right, 
 static ViewportDrawer _vd;
 
 TileHighlightData _thd;
-static TileInfo *_cur_ti;
+TileInfo *_cur_ti;
 bool _draw_bounding_boxes = false;
 bool _draw_dirty_blocks = false;
 uint _dirty_block_colour = 0;
@@ -260,12 +263,21 @@ void InitializeWindowViewport(Window *w, int x, int y,
 	w->viewport = vp;
 	vp->virtual_left = 0; // pt.x;
 	vp->virtual_top = 0;  // pt.y;
+
+	/* default projection as in 2D */
+	vp->cx = 0.0f;
+	vp->cy = 0.0f;
+	vp->cz = 0.0f;
+	vp->spin_y = 30.0f;
+	vp->spin_z = -45.0f + 180.0f;
 }
 
 static Point _vp_move_offs;
 
 static void DoSetViewportPosition(const Window *w, int left, int top, int width, int height)
 {
+	if (_draw3d) return;
+
 	FOR_ALL_WINDOWS_FROM_BACK_FROM(w, w) {
 		if (left + width > w->left &&
 				w->left + w->width > left &&
@@ -421,6 +433,7 @@ Point TranslateXYToTileCoord(const ViewPort *vp, int x, int y, bool clamp_to_map
 		return pt;
 	}
 
+	if (_draw3d) return MapInvCoords3D(vp, x - vp->left, y - vp->top, clamp_to_map);
 	return InverseRemapCoords2(
 			ScaleByZoom(x - vp->left, vp->zoom) + vp->virtual_left,
 			ScaleByZoom(y - vp->top, vp->zoom) + vp->virtual_top, clamp_to_map);
@@ -551,6 +564,12 @@ static void AddChildSpriteToFoundation(SpriteID image, PaletteID pal, const SubS
  */
 void DrawGroundSpriteAt(SpriteID image, PaletteID pal, int32 x, int32 y, int z, const SubSprite *sub, int extra_offs_x, int extra_offs_y)
 {
+	if (_redirect_draw)
+	{
+		DrawTileSprite3D(image, pal, x, y, _cur_ti->z + z);
+		return;
+	}
+
 	/* Switch to first foundation part, if no foundation was drawn */
 	if (_vd.foundation_part == FOUNDATION_PART_NONE) _vd.foundation_part = FOUNDATION_PART_NORMAL;
 
@@ -586,6 +605,8 @@ void DrawGroundSprite(SpriteID image, PaletteID pal, const SubSprite *sub, int e
  */
 void OffsetGroundSprite(int x, int y)
 {
+	if (_redirect_draw) return;
+
 	/* Switch to next foundation part */
 	switch (_vd.foundation_part) {
 		case FOUNDATION_PART_NONE:
@@ -618,6 +639,12 @@ void OffsetGroundSprite(int x, int y)
  */
 static void AddCombinedSprite(SpriteID image, PaletteID pal, int x, int y, int z, const SubSprite *sub)
 {
+	if (_redirect_draw)
+	{
+		DrawTileSprite3D(image, pal, x - _cur_ti->x, y - _cur_ti->y, z);
+		return;
+	}
+
 	Point pt = RemapCoords(x, y, z);
 	const Sprite *spr = GetSprite(image & SPRITE_MASK, ST_NORMAL);
 
@@ -666,6 +693,12 @@ void AddSortableSpriteToDraw(SpriteID image, PaletteID pal, int x, int y, int w,
 	if (transparent) {
 		SetBit(image, PALETTE_MODIFIER_TRANSPARENT);
 		pal = PALETTE_TO_TRANSPARENT;
+	}
+
+	if (_redirect_draw)
+	{
+		DrawTileSprite3D(image, pal, x - _cur_ti->x, y - _cur_ti->y, z);
+		return;
 	}
 
 	if (_vd.combine_sprites == SPRITE_COMBINE_ACTIVE) {
@@ -816,14 +849,20 @@ void AddChildSpriteScreen(SpriteID image, PaletteID pal, int x, int y, bool tran
 {
 	assert((image & SPRITE_MASK) < MAX_SPRITES);
 
-	/* If the ParentSprite was clipped by the viewport bounds, do not draw the ChildSprites either */
-	if (_vd.last_child == nullptr) return;
-
 	/* make the sprites transparent with the right palette */
 	if (transparent) {
 		SetBit(image, PALETTE_MODIFIER_TRANSPARENT);
 		pal = PALETTE_TO_TRANSPARENT;
 	}
+
+	if (_redirect_draw)
+	{
+		DrawTileSprite3D(image, pal, 0, 0, -1);
+		return;
+	}
+
+	/* If the ParentSprite was clipped by the viewport bounds, do not draw the ChildSprites either */
+	if (_vd.last_child == nullptr) return;
 
 	*_vd.last_child = (uint)_vd.child_screen_sprites_to_draw.size();
 
@@ -872,6 +911,12 @@ static void AddStringToDraw(int x, int y, StringID string, uint64 params_1, uint
  */
 static void DrawSelectionSprite(SpriteID image, PaletteID pal, const TileInfo *ti, int z_offset, FoundationPart foundation_part)
 {
+	if (_redirect_draw)
+	{
+		DrawTileSelection3D(image, pal);
+		return;
+	}
+
 	/* FIXME: This is not totally valid for some autorail highlights that extend over the edges of the tile. */
 	if (_vd.foundation[foundation_part] == -1) {
 		/* draw on real ground */
@@ -1075,7 +1120,7 @@ static void HighlightTownLocalAuthorityTiles(const TileInfo *ti)
  * Checks if the specified tile is selected and if so draws selection using correct selectionstyle.
  * @param *ti TileInfo Tile that is being drawn
  */
-static void DrawTileSelection(const TileInfo *ti)
+void DrawTileSelection(const TileInfo *ti)
 {
 	/* Highlight tiles insede local authority of selected towns. */
 	HighlightTownLocalAuthorityTiles(ti);
@@ -1770,6 +1815,8 @@ static inline void ViewportDraw(const ViewPort *vp, int left, int top, int right
  */
 void Window::DrawViewport() const
 {
+	if (_draw3d) return;
+
 	PerformanceAccumulator framerate(PFE_DRAWWORLD);
 
 	DrawPixelInfo *dpi = _cur_dpi;
@@ -1828,6 +1875,7 @@ void UpdateViewportPosition(Window *w)
 		w->viewport->scrollpos_x = pt.x;
 		w->viewport->scrollpos_y = pt.y;
 		SetViewportPosition(w, pt.x, pt.y);
+		if (_draw3d) SetViewportPosition3D(w->viewport);
 	} else {
 		/* Ensure the destination location is within the map */
 		ClampViewportToMap(vp, &w->viewport->dest_scrollpos_x, &w->viewport->dest_scrollpos_y);
@@ -1853,6 +1901,7 @@ void UpdateViewportPosition(Window *w)
 		ClampViewportToMap(vp, &w->viewport->scrollpos_x, &w->viewport->scrollpos_y);
 
 		SetViewportPosition(w, w->viewport->scrollpos_x, w->viewport->scrollpos_y);
+		if (_draw3d) SetViewportPosition3D(w->viewport);
 		if (update_overlay) RebuildViewportOverlay(w);
 	}
 }
@@ -1868,6 +1917,8 @@ void UpdateViewportPosition(Window *w)
  */
 static void MarkViewportDirty(const ViewPort *vp, int left, int top, int right, int bottom)
 {
+	if (_draw3d) return;
+
 	/* Rounding wrt. zoom-out level */
 	right  += (1 << vp->zoom) - 1;
 	bottom += (1 << vp->zoom) - 1;
@@ -1937,6 +1988,12 @@ void ConstrainAllViewportsZoom()
  */
 void MarkTileDirtyByTile(TileIndex tile, int bridge_level_offset, int tile_height_override)
 {
+	if (_draw3d)
+	{
+		MarkTileDirty3D(tile);
+		return;
+	}
+
 	Point pt = RemapCoords(TileX(tile) * TILE_SIZE, TileY(tile) * TILE_SIZE, tile_height_override * TILE_HEIGHT);
 	MarkAllViewportsDirty(
 			pt.x - MAX_TILE_EXTENT_LEFT,
@@ -2009,24 +2066,42 @@ static void SetSelectionTilesDirty()
 		do {
 			/* topmost dirty point */
 			TileIndex top_tile = TileVirtXY(top_x, top_y);
-			Point top = RemapCoords(top_x, top_y, GetTileMaxPixelZ(top_tile));
-
-			/* bottommost point */
 			TileIndex bottom_tile = TileVirtXY(bot_x, bot_y);
-			Point bot = RemapCoords(bot_x + TILE_SIZE, bot_y + TILE_SIZE, GetTilePixelZ(bottom_tile)); // bottommost point
+			if (_draw3d)
+			{
+				int xs = top_x / TILE_SIZE;
+				int xf = CeilDiv(bot_x, TILE_SIZE);
+				int ys = top_y / TILE_SIZE;
+				int yf = CeilDiv(bot_y, TILE_SIZE);
+				for (int y = ys; y <= yf; y++)
+				{
+					for (int x = xs; x <= xf; x++)
+					{
+						MarkTileDirtyByTile(TileXY(x, y));
+					}
+				}
+			}
+			else
+			{
+				/* topmost dirty point */
+				Point top = RemapCoords(top_x, top_y, GetTileMaxPixelZ(top_tile));
 
-			/* the 'x' coordinate of 'top' and 'bot' is the same (and always in the same distance from tile middle),
-			 * tile height/slope affects only the 'y' on-screen coordinate! */
+				/* bottommost point */
+				Point bot = RemapCoords(bot_x + TILE_SIZE, bot_y + TILE_SIZE, GetTilePixelZ(bottom_tile)); // bottommost point
 
-			int l = top.x - TILE_PIXELS * ZOOM_LVL_BASE; // 'x' coordinate of left   side of the dirty rectangle
-			int t = top.y;                               // 'y' coordinate of top    side of the dirty rectangle
-			int r = top.x + TILE_PIXELS * ZOOM_LVL_BASE; // 'x' coordinate of right  side of the dirty rectangle
-			int b = bot.y;                               // 'y' coordinate of bottom side of the dirty rectangle
+				/* the 'x' coordinate of 'top' and 'bot' is the same (and always in the same distance from tile middle),
+				 * tile height/slope affects only the 'y' on-screen coordinate! */
 
-			static const int OVERLAY_WIDTH = 4 * ZOOM_LVL_BASE; // part of selection sprites is drawn outside the selected area (in particular: terraforming)
+				int l = top.x - TILE_PIXELS * ZOOM_LVL_BASE; // 'x' coordinate of left   side of the dirty rectangle
+				int t = top.y;                               // 'y' coordinate of top    side of the dirty rectangle
+				int r = top.x + TILE_PIXELS * ZOOM_LVL_BASE; // 'x' coordinate of right  side of the dirty rectangle
+				int b = bot.y;                               // 'y' coordinate of bottom side of the dirty rectangle
 
-			/* For halftile foundations on SLOPE_STEEP_S the sprite extents some more towards the top */
-			MarkAllViewportsDirty(l - OVERLAY_WIDTH, t - OVERLAY_WIDTH - TILE_HEIGHT * ZOOM_LVL_BASE, r + OVERLAY_WIDTH, b + OVERLAY_WIDTH);
+				static const int OVERLAY_WIDTH = 4 * ZOOM_LVL_BASE; // part of selection sprites is drawn outside the selected area (in particular: terraforming)
+
+				/* For halftile foundations on SLOPE_STEEP_S the sprite extents some more towards the top */
+				MarkAllViewportsDirty(l - OVERLAY_WIDTH, t - OVERLAY_WIDTH - TILE_HEIGHT * ZOOM_LVL_BASE, r + OVERLAY_WIDTH, b + OVERLAY_WIDTH);
+			}
 
 			/* haven't we reached the topmost tile yet? */
 			if (top_x != x_start) {
@@ -2098,6 +2173,8 @@ static bool CheckClickOnViewportSign(const ViewPort *vp, int x, int y, const Vie
 static bool CheckClickOnViewportSign(const ViewPort *vp, int x, int y)
 {
 	if (_game_mode == GM_MENU) return false;
+
+	if (_draw3d) return CheckClickOnViewportSign3D(vp, x, y);
 
 	x = ScaleByZoom(x - vp->left, vp->zoom) + vp->virtual_left;
 	y = ScaleByZoom(y - vp->top, vp->zoom) + vp->virtual_top;

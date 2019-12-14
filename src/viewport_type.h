@@ -32,6 +32,17 @@ struct ViewPort {
 
 	ZoomLevel zoom; ///< The zoom level of the viewport.
 	LinkGraphOverlay *overlay;
+
+	/* 3D viewport data */
+	float cx;				///< point we are lookin on x
+	float cy;				///< point we are lookin on y
+	float cz;				///< point we are lookin on z
+	float spin_y;			///< camera spin y
+	float spin_z;			///< camera spin z
+	float xyz_to_vp[16];	///< transform from xyz coords to 3D view port coords
+	float vp_to_xyz[16];	///< transform from 3D view port coords to xyz coords
+	float xyz_to_ogl[16];	///< transform from xyz coords to OpenGL coords
+	float ogl_to_xyz[16];	///< transform OpenGL coords to xyz coords
 };
 
 /** Margins for the viewport sign */

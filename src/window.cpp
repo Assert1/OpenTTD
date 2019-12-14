@@ -38,6 +38,8 @@
 #include "network/network_func.h"
 #include "guitimer_func.h"
 #include "news_func.h"
+#include "viewport3d/gfx3d.h"
+#include "viewport3d/viewport3d.h"
 
 #include "safeguards.h"
 
@@ -868,7 +870,7 @@ static void DispatchMouseWheelEvent(Window *w, NWidgetCore *nwid, int wheel)
  * @param w The window to consider.
  * @return True iff it may be shown, otherwise false.
  */
-static bool MayBeShown(const Window *w)
+bool MayBeShown(const Window *w)
 {
 	/* If we're not modal, everything is okay. */
 	if (!HasModalProgress()) return true;
@@ -896,7 +898,7 @@ static bool MayBeShown(const Window *w)
  * @param right Right edge of the rectangle that should be repainted
  * @param bottom Bottom edge of the rectangle that should be repainted
  */
-static void DrawOverlappedWindow(Window *w, int left, int top, int right, int bottom)
+void DrawOverlappedWindow(Window *w, int left, int top, int right, int bottom)
 {
 	const Window *v;
 	FOR_ALL_WINDOWS_FROM_BACK_FROM(v, w->z_front) {
@@ -1913,6 +1915,8 @@ void InitWindowSystem()
  */
 void UnInitWindowSystem()
 {
+	ResetViewport3D();
+
 	UnshowCriticalError();
 
 	Window *w;
@@ -2487,7 +2491,8 @@ static EventState HandleViewportScroll()
 	 * outside of the window and should not left-mouse scroll anymore. */
 	if (_last_scroll_window == nullptr) _last_scroll_window = FindWindowFromPt(_cursor.pos.x, _cursor.pos.y);
 
-	if (_last_scroll_window == nullptr || !((_settings_client.gui.scroll_mode != VSM_MAP_LMB && _right_button_down) || scrollwheel_scrolling || (_settings_client.gui.scroll_mode == VSM_MAP_LMB && _left_button_down))) {
+	bool mbd3d = _middle_button_down && _draw3d;
+	if (_last_scroll_window == nullptr || !((_settings_client.gui.scroll_mode != VSM_MAP_LMB && (_right_button_down || mbd3d)) || scrollwheel_scrolling || (_settings_client.gui.scroll_mode == VSM_MAP_LMB && (_left_button_down || mbd3d)))) {
 		_cursor.fix_at = false;
 		_scrolling_viewport = false;
 		_last_scroll_window = nullptr;
@@ -2496,9 +2501,13 @@ static EventState HandleViewportScroll()
 
 	if (_last_scroll_window == FindWindowById(WC_MAIN_WINDOW, 0) && _last_scroll_window->viewport->follow_vehicle != INVALID_VEHICLE) {
 		/* If the main window is following a vehicle, then first let go of it! */
-		const Vehicle *veh = Vehicle::Get(_last_scroll_window->viewport->follow_vehicle);
-		ScrollMainWindowTo(veh->x_pos, veh->y_pos, veh->z_pos, true); // This also resets follow_vehicle
-		return ES_NOT_HANDLED;
+		if (_right_button_down || _left_button_down)
+		{
+			/* let them go only if really scrolling */
+			const Vehicle *veh = Vehicle::Get(_last_scroll_window->viewport->follow_vehicle);
+			ScrollMainWindowTo(veh->x_pos, veh->y_pos, veh->z_pos, true); // This also resets follow_vehicle
+			return ES_NOT_HANDLED;
+		}
 	}
 
 	Point delta;
@@ -2810,6 +2819,7 @@ enum MouseClick {
 	MC_NONE = 0,
 	MC_LEFT,
 	MC_RIGHT,
+	MC_MIDDLE,
 	MC_DOUBLE_LEFT,
 	MC_HOVER,
 
@@ -2928,6 +2938,15 @@ static void MouseLoop(MouseClick click, int mousewheel)
 				}
 				break;
 
+			case MC_MIDDLE:
+				if (_settings_client.gui.scroll_mode != VSM_MAP_LMB) {
+					_scrolling_viewport = true;
+					_cursor.fix_at = (_settings_client.gui.scroll_mode == VSM_VIEWPORT_RMB_FIXED ||
+									  _settings_client.gui.scroll_mode == VSM_MAP_RMB_FIXED);
+					return;
+				}
+				break;
+
 			case MC_RIGHT:
 				if (!(w->flags & WF_DISABLE_VP_SCROLL) &&
 						_settings_client.gui.scroll_mode != VSM_MAP_LMB) {
@@ -3000,6 +3019,10 @@ void HandleMouseEvents()
 		_right_button_clicked = false;
 		click = MC_RIGHT;
 		_input_events_this_tick++;
+	} else if (_middle_button_clicked) {
+		_middle_button_clicked = false;
+		click = MC_MIDDLE;
+		_input_events_this_tick++;
 	}
 
 	int mousewheel = 0;
@@ -3013,7 +3036,7 @@ void HandleMouseEvents()
 	static Point hover_pos = {0, 0};
 
 	if (_settings_client.gui.hover_delay_ms > 0) {
-		if (!_cursor.in_window || click != MC_NONE || mousewheel != 0 || _left_button_down || _right_button_down ||
+		if (!_cursor.in_window || click != MC_NONE || mousewheel != 0 || _left_button_down || _right_button_down || _middle_button_down ||
 				hover_pos.x == 0 || abs(_cursor.pos.x - hover_pos.x) >= MAX_OFFSET_HOVER  ||
 				hover_pos.y == 0 || abs(_cursor.pos.y - hover_pos.y) >= MAX_OFFSET_HOVER) {
 			hover_pos = _cursor.pos;
@@ -3202,6 +3225,9 @@ void UpdateWindows()
 		/* Update viewport only if window is not shaded. */
 		if (w->viewport != nullptr && !w->IsShaded()) UpdateViewportPosition(w);
 	}
+
+	BlitterFactory::GetCurrentBlitter()->Flush();
+
 	NetworkDrawChatMessage();
 	/* Redraw mouse cursor in case it was hidden */
 	DrawMouseCursor();
