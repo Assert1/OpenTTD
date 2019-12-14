@@ -167,12 +167,14 @@ const char *VideoDriver_Win32_OGL::DoStart()
 #endif
 	int attribs[] = {
 //		WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+//		WGL_CONTEXT_MINOR_VERSION_ARB, 0,
+//		WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
 //		WGL_CONTEXT_MINOR_VERSION_ARB, 3,
 //		WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
 //		WGL_CONTEXT_MINOR_VERSION_ARB, 3,
 //		GL_CONTEXT_PROFILE_MASK, GL_CONTEXT_CORE_PROFILE_BIT,
-//		GL_CONTEXT_PROFILE_MASK, WGL_CONTEXT_ES_PROFILE_BIT_EXT,
 		GL_CONTEXT_PROFILE_MASK, GL_CONTEXT_COMPATIBILITY_PROFILE_BIT,
+//		GL_CONTEXT_PROFILE_MASK, WGL_CONTEXT_ES_PROFILE_BIT_EXT,
 		WGL_CONTEXT_FLAGS_ARB, flags,
 		0, 0
 	};
@@ -185,17 +187,21 @@ const char *VideoDriver_Win32_OGL::DoStart()
 
 	wglMakeCurrent(_wnd.dc, _wnd.rc);
 	if (!gladLoadGLLoader((GLADloadproc)(GetAnyGLFuncAddress))) return "Failed to init glad!";
-	if (!GLAD_GL_VERSION_3_3) return "OpenGL 3.3 or greater is required!";
+//	if (!gladLoadGLES2Loader((GLADloadproc)(GetAnyGLFuncAddress))) return "Failed to init glad!";
+	if (!GLAD_GL_VERSION_3_3 && !GLAD_GL_ES_VERSION_3_0) return "OpenGL 3.3 or greater is required!";
 
 #ifdef _DEBUG
-	glDebugMessageCallback(&DebugMessage, nullptr);
+	if (GLAD_GL_VERSION_3_3)
+	{
+		glDebugMessageCallback(&DebugMessage, nullptr);
 
-	GLuint id = 0;
-	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, &id, true); // enable all
-	id = 131185; glDebugMessageControl(GL_DEBUG_SOURCE_API, GL_DEBUG_TYPE_OTHER, GL_DONT_CARE, 1, &id, false); // disable messages about stream draw buffers in the video memory
+		GLuint id = 0;
+		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, &id, true); // enable all
+		id = 131185; glDebugMessageControl(GL_DEBUG_SOURCE_API, GL_DEBUG_TYPE_OTHER, GL_DONT_CARE, 1, &id, false); // disable messages about stream draw buffers in the video memory
 
-	glEnable(GL_DEBUG_OUTPUT);
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+	}
 #endif
 	
 	const GLubyte *glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);

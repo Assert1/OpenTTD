@@ -4,7 +4,7 @@ in vec4 var_color;
 in vec4 var_fade;
 in float var_lod;
 
-uniform sampler1D pal;
+uniform sampler2D pal;
 uniform sampler2D checker;
 uniform sampler2D recol_pal;
 uniform sampler2DArray atlas_c;
@@ -24,7 +24,7 @@ void main()
 	float val_t = texture(recol_pal, vec2(val_m, var_tex.w)).r; // palette pos for sprite recolor
 
 	float val_p = mix(mix(val_m, val_t, var_blend.w), val_r, var_blend.z); // palette pos
-	vec4 m_color = mix(col, texture(pal, val_p), val_u); // sprite color
+	vec4 m_color = mix(col, texture(pal, vec2(val_p, 0.5)), val_u); // sprite color
 
 	float a_fill = mix(1.0, texture(checker, var_tex.xy).r, var_blend.x); // checker fill
 	float c_fill = a_fill * var_blend.y; // filling rect?

@@ -362,8 +362,11 @@ static void RedrawWindowViewport(Window *vp)
 		/* configure to draw the viewport */
 		glViewport(vp->viewport->left, _screen.height - vp->viewport->top - vp->viewport->height, vp->viewport->width, vp->viewport->height);
 
-		glColorMaski(0, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-		glColorMaski(1, GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE); // not using global screen blit palette resolver
+		if (GLAD_GL_VERSION_3_3)
+		{
+			glColorMaski(0, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+			glColorMaski(1, GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE); // not using global screen blit palette resolver
+		}
 		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 		glStencilMask(0);
 

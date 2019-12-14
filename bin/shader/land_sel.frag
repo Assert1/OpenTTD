@@ -2,17 +2,18 @@ in vec4 var_tex;
 in vec4 var_loc;
 in vec4 var_mip;
 
-uniform sampler1D pal;
+uniform sampler2D pal;
 uniform sampler2D recol_pal;
 uniform sampler2DArray atlas_c;
 uniform sampler2DArray atlas_m;
 
 layout(location = 0) out vec4 frag_color;
+layout(location = 1) out vec4 frag_map;
 
 vec2 atlas_edge_bound(vec2 tex)
 {
 #ifdef _GL_VERSION_3_3
-	ivec2 size = textureSize(atlas_c, 0).xy;
+	vec2 size = vec2(textureSize(atlas_c, 0).xy);
 
 	vec2 dxt = dFdx(tex) * size;
 	vec2 dyt = dFdy(tex) * size;
@@ -45,8 +46,9 @@ void main()
 	float val_u = clamp(255.0 - idx_m, 0.0, 1.0); // use recolor index?
 	float val_t = texture(recol_pal, vec2(map, var_tex.w)).x; // palette pos for recolor
 
-	vec4 m_color = mix(col, texture(pal, val_t), val_u); // color
+	vec4 m_color = mix(col, texture(pal, vec2(val_t, 0.5)), val_u); // color
 	if (m_color.a <= 0.0) discard;
 
 	frag_color = vec4(m_color.rgb, 1.0); // final color
+	frag_map = vec4(0.0, 0.0, 0.0, 1.0);
 }

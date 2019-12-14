@@ -1,6 +1,6 @@
 in vec4 var_tex;
 
-uniform sampler1D pal;
+uniform sampler2D pal;
 uniform sampler2D screen_c;
 uniform sampler2D screen_m;
 
@@ -13,5 +13,5 @@ void main()
 
 	float idx_z = map * 255.0; // palette index
 	float idx_c = clamp(idx_z, 0.0, 1.0); // use palette?
-	frag_color = mix(col, texture(pal, map), idx_c); // final color
+	frag_color = mix(col, texture(pal, vec2(map, 0.5)), idx_c); // final color
 }
