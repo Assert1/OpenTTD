@@ -34,7 +34,7 @@ public:
 typedef std::multimap<ImageEntry::Key, uint32, LessFctr> EntrysMap;
 static EntrysMap _entrys_map;
 
-void __cdecl png_read_data_fn(png_structp png, png_bytep data, png_size_t length)
+void CDECL png_read_data_fn(png_structp png, png_bytep data, png_size_t length)
 {
 	png_voidp ptr = png_get_io_ptr(png);
 	memcpy(data, ptr, (size_t)(length));

@@ -1,10 +1,11 @@
 #ifndef MATH3D_H
 #define MATH3D_H
 
-#include <math.h>
 #include "viewport3d.h"
 #include "../core/math_func.hpp"
 #include "../core/mem_func.hpp"
+#include <cfloat>
+#include <cmath>
 
 #define RAD(x)		(((x) / 180.0f) * (float)(M_PI))
 #define GRAD(x)		(((x) / (float)(M_PI)) * 180.0f)
@@ -21,7 +22,7 @@ inline float lerpCkeck(float a, float b, float t)
 
 inline float angClamp(float v, float min, float max)
 {
-	float period=(max - min);
+	float period = (max - min);
 	if (v <  min)v += (float)(((int)((min - v) / period) + 1) * period);
 	if (v >= max)v -= (float)(((int)((v - max) / period) + 1) * period);
 	return v;
@@ -107,7 +108,7 @@ inline float vectDot43(const float *a, const float *b)
 
 inline float vectLength3(const float *v)
 {
-	return sqrtf(vectDot3(v, v));
+	return sqrt(vectDot3(v, v));
 }
 
 inline void vectInv3(float *dst, const float *src)
@@ -144,8 +145,8 @@ inline void vectTriNormal(float *dst, const float *a, const float *b, const floa
 
 inline void SinCos(float angle, float &s, float &c)
 {
-	s = sinf(angle);
-	c = cosf(angle);
+	s = sin(angle);
+	c = cos(angle);
 }
 
 inline void quatSetRotate(float *dst, float x, float y, float z, float angle)

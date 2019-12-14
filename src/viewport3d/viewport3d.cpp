@@ -2357,7 +2357,7 @@ static void UpdateLandObjectProgram()
 	if (_land_object_program) return;
 
 	char opts[64];
-	sprintf_s(opts, "%s%s", _use_shadows_set ? "#define SHADOWS\r\n" : "", _multisample_set ? "#define MULTISAMPLE\r\n" : "");
+	sprintf(opts, "%s%s", _use_shadows_set ? "#define SHADOWS\r\n" : "", _multisample_set ? "#define MULTISAMPLE\r\n" : "");
 	GLuint vs = ShaderLoad("shader/land_object.vert", GL_VERTEX_SHADER, opts);
 	GLuint fs = ShaderLoad("shader/land_object.frag", GL_FRAGMENT_SHADER, opts);
 	_land_object_program = ProgramLink(vs, fs);
@@ -2409,7 +2409,7 @@ static void UpdateObjectProgram()
 	if (_object_program) return;
 
 	char opts[64];
-	sprintf_s(opts, "%s%s", _use_shadows_set ? "#define SHADOWS\r\n" : "", _multisample_set ? "#define MULTISAMPLE\r\n" : "");
+	sprintf(opts, "%s%s", _use_shadows_set ? "#define SHADOWS\r\n" : "", _multisample_set ? "#define MULTISAMPLE\r\n" : "");
 	GLuint vs = ShaderLoad("shader/object.vert", GL_VERTEX_SHADER, opts);
 	GLuint fs = ShaderLoad("shader/object.frag", GL_FRAGMENT_SHADER, opts);
 	_object_program = ProgramLink(vs, fs);
