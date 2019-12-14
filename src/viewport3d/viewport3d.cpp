@@ -2643,7 +2643,7 @@ static void DrawDataColor(const ViewPort *vp)
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindSampler(0, _sampler[0]);
-		glBindTexture(GL_TEXTURE_2D, blitter->PalTexture());
+		glBindTexture(GL_TEXTURE_1D, blitter->PalTexture());
 		glUniform1i(_land_uniforms_link[3], 0);
 
 		glActiveTexture(GL_TEXTURE1);
@@ -2696,7 +2696,7 @@ static void DrawDataColor(const ViewPort *vp)
 		glBindVertexArray(0);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindTexture(GL_TEXTURE_1D, 0);
 		glBindSampler(0, 0);
 
 		glActiveTexture(GL_TEXTURE1);
@@ -2733,7 +2733,7 @@ static void DrawDataColor(const ViewPort *vp)
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindSampler(0, _sampler[0]);
-		glBindTexture(GL_TEXTURE_2D, blitter->PalTexture());
+		glBindTexture(GL_TEXTURE_1D, blitter->PalTexture());
 		glUniform1i(_land_object_uniforms_link[3], 0);
 
 		glActiveTexture(GL_TEXTURE1);
@@ -2811,7 +2811,7 @@ static void DrawDataColor(const ViewPort *vp)
 		glBindVertexArray(0);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindTexture(GL_TEXTURE_1D, 0);
 		glBindSampler(0, 0);
 
 		glActiveTexture(GL_TEXTURE1);
@@ -2844,7 +2844,7 @@ static void DrawDataColor(const ViewPort *vp)
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindSampler(0, _sampler[0]);
-		glBindTexture(GL_TEXTURE_2D, blitter->PalTexture());
+		glBindTexture(GL_TEXTURE_1D, blitter->PalTexture());
 		glUniform1i(_land_sel_uniforms_link[2], 0);
 
 		glActiveTexture(GL_TEXTURE1);
@@ -2886,7 +2886,7 @@ static void DrawDataColor(const ViewPort *vp)
 		glDepthMask(GL_TRUE);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindTexture(GL_TEXTURE_1D, 0);
 		glBindSampler(0, 0);
 
 		glActiveTexture(GL_TEXTURE1);
@@ -2913,7 +2913,7 @@ static void DrawDataColor(const ViewPort *vp)
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindSampler(0, _sampler[0]);
-		glBindTexture(GL_TEXTURE_2D, blitter->PalTexture());
+		glBindTexture(GL_TEXTURE_1D, blitter->PalTexture());
 		glUniform1i(_object_uniforms_link[3], 0);
 
 		glActiveTexture(GL_TEXTURE1);
@@ -2991,7 +2991,7 @@ static void DrawDataColor(const ViewPort *vp)
 		glBindVertexArray(0);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindTexture(GL_TEXTURE_1D, 0);
 		glBindSampler(0, 0);
 
 		glActiveTexture(GL_TEXTURE1);

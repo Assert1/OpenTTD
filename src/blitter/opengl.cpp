@@ -22,6 +22,7 @@
 #include "../safeguards.h"
 
 #define ATLAS_SIZE		1024		// atlas texture layer dimension
+#define DEF_BUFFER		GL_FRONT	// GL_FRONT or GL_BACK in case of double buffer
 #define ATLAS_ALIGN		8			// alignment of sprites in the atlas
 #define DOWNSCALE		2			// downscale of the color sprites
 
@@ -278,19 +279,19 @@ void Blitter_OpenGL::UpdatePal()
 	{
 		glGenTextures(1, &_pal_texture);
 
-		glBindTexture(GL_TEXTURE_2D, _pal_texture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 256, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1);
-		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindTexture(GL_TEXTURE_1D, _pal_texture);
+		glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA8, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAX_LEVEL, 1);
+		glBindTexture(GL_TEXTURE_1D, 0);
 	}
 	
-	glBindTexture(GL_TEXTURE_2D, _pal_texture);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 1, GL_RGBA, GL_UNSIGNED_BYTE, _pal_data);
-	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(GL_TEXTURE_1D, _pal_texture);
+	glTexSubImage1D(GL_TEXTURE_1D, 0, 0, 256, GL_RGBA, GL_UNSIGNED_BYTE, _pal_data);
+	glBindTexture(GL_TEXTURE_1D, 0);
 
 	_pal_dirty = 0;
 }
@@ -968,6 +969,8 @@ void Blitter_OpenGL::FlushPixels()
 	glDisable(GL_BLEND);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glReadBuffer(DEF_BUFFER);
+	glDrawBuffer(DEF_BUFFER);
 
 	if ((_pixel_size_x != _size_x) || (_pixel_size_y != _size_y))
 	{
@@ -1004,7 +1007,7 @@ void Blitter_OpenGL::DrawBuffers(int size_x, int size_y)
 		glUniform4f(_batch_uniforms_link[1], 1.0f / (float)(ATLAS_SIZE), 1.0f / (float)(ATLAS_SIZE), 1.0f, 1.0f / (float)(_recol_pal.size() + 1));
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, _pal_texture);
+		glBindTexture(GL_TEXTURE_1D, _pal_texture);
 		glUniform1i(_batch_uniforms_link[2], 0);
 
 		glActiveTexture(GL_TEXTURE1);
@@ -1076,7 +1079,7 @@ void Blitter_OpenGL::BlitScreen()
 		glUniform4f(_blit_uniforms_link[0], +2.0f / (float)(_size_x), +2.0f / (float)(_size_y), -1.0f, -1.0f);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, _pal_texture);
+		glBindTexture(GL_TEXTURE_1D, _pal_texture);
 		glUniform1i(_blit_uniforms_link[1], 0);
 
 		glActiveTexture(GL_TEXTURE1);
@@ -1684,6 +1687,8 @@ void Blitter_OpenGL::Flush()
 	if (_multisample_set > 0 && GLAD_GL_VERSION_3_3) glDisable(GL_MULTISAMPLE);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glReadBuffer(DEF_BUFFER);
+	glDrawBuffer(DEF_BUFFER);
 
 	///
 
@@ -1745,7 +1750,9 @@ void Blitter_OpenGL::Finish()
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	
+
+	glFlush();
+
 	_flushed = 0;
 }
 
@@ -1783,6 +1790,8 @@ void Blitter_OpenGL::Finish3D()
 	if (_multisample_set > 0 && GLAD_GL_VERSION_3_3) glDisable(GL_MULTISAMPLE);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glReadBuffer(DEF_BUFFER);
+	glDrawBuffer(DEF_BUFFER);
 
 	_overlay_z = 0.5f; // restore overlay z
 }
